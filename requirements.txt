@@ -1,0 +1,5 @@
+flask==3.1.2
+pillow==12.1.0
+numpy==2.4.0
+rembg[gpu]
+requests==2.32.5

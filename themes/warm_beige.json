@@ -1,0 +1,14 @@
+{
+  "name": "Warm Beige",
+  "bg": "#f5efe0",
+  "text": "#5c3d1e",
+  "gradient_color": "#f5efe0",
+  "mapbox_paint": {
+    "background": "#f5efe0",
+    "water": "#c8dce8",
+    "park": "#d4e8c8",
+    "road_major": "#8b5e3c",
+    "road_minor": "#b88a60",
+    "building": "#e8d8b8"
+  }
+}

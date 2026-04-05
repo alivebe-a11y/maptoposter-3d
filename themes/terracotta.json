@@ -1,0 +1,14 @@
+{
+  "name": "Terracotta",
+  "bg": "#3d1a0a",
+  "text": "#f0c090",
+  "gradient_color": "#3d1a0a",
+  "mapbox_paint": {
+    "background": "#3d1a0a",
+    "water": "#5a3020",
+    "park": "#4a2510",
+    "road_major": "#e87840",
+    "road_minor": "#c85820",
+    "building": "#502010"
+  }
+}

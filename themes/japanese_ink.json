@@ -1,0 +1,14 @@
+{
+  "name": "Japanese Ink",
+  "bg": "#f4f0e8",
+  "text": "#1a1a1a",
+  "gradient_color": "#f4f0e8",
+  "mapbox_paint": {
+    "background": "#f4f0e8",
+    "water": "#c8d8e8",
+    "park": "#d4e0cc",
+    "road_major": "#1a1a1a",
+    "road_minor": "#4a4a4a",
+    "building": "#e0d8cc"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "name": "Neon Cyberpunk",
+  "bg": "#07000f",
+  "text": "#ff00ff",
+  "gradient_color": "#07000f",
+  "mapbox_paint": {
+    "background": "#07000f",
+    "water": "#0d0020",
+    "park": "#060012",
+    "road_major": "#ff00ff",
+    "road_minor": "#00ffee",
+    "building": "#120025"
+  }
+}

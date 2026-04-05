@@ -1,0 +1,9 @@
+__pycache__/
+*.pyc
+*.pyo
+posters/
+overlays_cache/
+u2net/
+.env
+fonts/*.ttf
+badges/

@@ -1,0 +1,14 @@
+{
+  "name": "Blueprint",
+  "bg": "#0a1628",
+  "text": "#e0f0ff",
+  "gradient_color": "#0a1628",
+  "mapbox_paint": {
+    "background": "#0a1628",
+    "water": "#0c2240",
+    "park": "#0e1e38",
+    "road_major": "#7ecfff",
+    "road_minor": "#4a9fd4",
+    "building": "#162844"
+  }
+}

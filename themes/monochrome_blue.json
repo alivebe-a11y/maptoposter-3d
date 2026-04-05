@@ -1,0 +1,14 @@
+{
+  "name": "Monochrome Blue",
+  "bg": "#080e1a",
+  "text": "#8aa0c0",
+  "gradient_color": "#080e1a",
+  "mapbox_paint": {
+    "background": "#080e1a",
+    "water": "#0e1a2e",
+    "park": "#0c1824",
+    "road_major": "#7090b8",
+    "road_minor": "#4a6888",
+    "building": "#101e30"
+  }
+}

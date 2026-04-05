@@ -1,0 +1,14 @@
+{
+  "name": "Copper Patina",
+  "bg": "#0a1e1a",
+  "text": "#b87333",
+  "gradient_color": "#0a1e1a",
+  "mapbox_paint": {
+    "background": "#0a1e1a",
+    "water": "#122820",
+    "park": "#102420",
+    "road_major": "#c8803a",
+    "road_minor": "#7ab8a8",
+    "building": "#162e28"
+  }
+}

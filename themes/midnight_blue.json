@@ -1,0 +1,14 @@
+{
+  "name": "Midnight Blue",
+  "bg": "#05103a",
+  "text": "#f5c842",
+  "gradient_color": "#05103a",
+  "mapbox_paint": {
+    "background": "#05103a",
+    "water": "#0a1f5c",
+    "park": "#081840",
+    "road_major": "#f5c842",
+    "road_minor": "#c8a030",
+    "building": "#0d2060"
+  }
+}

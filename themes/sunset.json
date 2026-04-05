@@ -1,0 +1,14 @@
+{
+  "name": "Sunset",
+  "bg": "#1a0a14",
+  "text": "#ff9060",
+  "gradient_color": "#1a0a14",
+  "mapbox_paint": {
+    "background": "#1a0a14",
+    "water": "#2a1028",
+    "park": "#200e1a",
+    "road_major": "#ff7040",
+    "road_minor": "#e05030",
+    "building": "#280c1e"
+  }
+}

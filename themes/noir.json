@@ -1,0 +1,14 @@
+{
+  "name": "Noir",
+  "bg": "#0a0a0a",
+  "text": "#ffffff",
+  "gradient_color": "#0a0a0a",
+  "mapbox_paint": {
+    "background": "#0a0a0a",
+    "water": "#111111",
+    "park": "#141414",
+    "road_major": "#ffffff",
+    "road_minor": "#aaaaaa",
+    "building": "#1e1e1e"
+  }
+}

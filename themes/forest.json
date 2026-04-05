@@ -1,0 +1,14 @@
+{
+  "name": "Forest",
+  "bg": "#0d1f0d",
+  "text": "#a8d8a8",
+  "gradient_color": "#0d1f0d",
+  "mapbox_paint": {
+    "background": "#0d1f0d",
+    "water": "#1a3a2a",
+    "park": "#1a2e1a",
+    "road_major": "#6ab86a",
+    "road_minor": "#4a8a4a",
+    "building": "#182818"
+  }
+}

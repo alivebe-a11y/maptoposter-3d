@@ -1,0 +1,14 @@
+{
+  "name": "Gradient Roads",
+  "bg": "#080810",
+  "text": "#9080ff",
+  "gradient_color": "#080810",
+  "mapbox_paint": {
+    "background": "#080810",
+    "water": "#0a0c20",
+    "park": "#0c0e18",
+    "road_major": "#6040e0",
+    "road_minor": "#8060ff",
+    "building": "#0e1020"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "name": "Feature Based",
+  "bg": "#0e0e0e",
+  "text": "#e0e0e0",
+  "gradient_color": "#0e0e0e",
+  "mapbox_paint": {
+    "background": "#0e0e0e",
+    "water": "#1a2a38",
+    "park": "#0e1e10",
+    "road_major": "#e8d080",
+    "road_minor": "#c0a860",
+    "building": "#1e1e1e"
+  }
+}

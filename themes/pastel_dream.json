@@ -1,0 +1,14 @@
+{
+  "name": "Pastel Dream",
+  "bg": "#f8f6ff",
+  "text": "#6b5b8e",
+  "gradient_color": "#f8f6ff",
+  "mapbox_paint": {
+    "background": "#f8f6ff",
+    "water": "#b8d8f0",
+    "park": "#c8f0d4",
+    "road_major": "#c8a8e0",
+    "road_minor": "#e0c8f0",
+    "building": "#f0e8ff"
+  }
+}

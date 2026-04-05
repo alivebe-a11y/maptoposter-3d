@@ -1,0 +1,14 @@
+{
+  "name": "Ocean",
+  "bg": "#05202e",
+  "text": "#80e0f0",
+  "gradient_color": "#05202e",
+  "mapbox_paint": {
+    "background": "#05202e",
+    "water": "#0a3a50",
+    "park": "#0a2a38",
+    "road_major": "#80e0f0",
+    "road_minor": "#50b8d0",
+    "building": "#0e3048"
+  }
+}

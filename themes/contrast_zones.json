@@ -1,0 +1,14 @@
+{
+  "name": "Contrast Zones",
+  "bg": "#000000",
+  "text": "#ffffff",
+  "gradient_color": "#000000",
+  "mapbox_paint": {
+    "background": "#000000",
+    "water": "#0a0a0a",
+    "park": "#111111",
+    "road_major": "#ffffff",
+    "road_minor": "#888888",
+    "building": "#333333"
+  }
+}

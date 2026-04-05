@@ -1,0 +1,14 @@
+{
+  "name": "Autumn",
+  "bg": "#1e0e04",
+  "text": "#e8803a",
+  "gradient_color": "#1e0e04",
+  "mapbox_paint": {
+    "background": "#1e0e04",
+    "water": "#2a1a0a",
+    "park": "#281408",
+    "road_major": "#cc5500",
+    "road_minor": "#aa4400",
+    "building": "#2e1206"
+  }
+}
