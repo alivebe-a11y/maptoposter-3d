@@ -211,9 +211,7 @@ function initLightingButtons() {
       btn.classList.add('active');
       lightPreset = btn.dataset.preset;
       if (previewMap) {
-        try {
-          previewMap.setConfigProperty('basemap', 'lightPreset', lightPreset);
-        } catch (e) {}
+        try { previewMap.setConfigProperty('basemap', 'lightPreset', lightPreset); } catch (e) {}
       }
     });
   });
@@ -244,22 +242,14 @@ function get3DConfig() {
 }
 
 // ---- Basemap Config ----
-function makeBasemapConfig(lp) {
-  return {
-    imports: [{
-      id: 'basemap',
-      url: 'mapbox://mapbox.standard',
-      config: {
-        lightPreset: lp || 'dusk',
-        showPointOfInterestLabels: false,
-        showPlaceLabels: false,
-        showRoadLabels: false,
-        showTransitLabels: false,
-        buildingsType: '3d',
-        showBuildings: true
-      }
-    }]
-  };
+const STANDARD_STYLE = 'mapbox://styles/mapbox/standard';
+
+function applyBasemapConfig(map, lp) {
+  try { map.setConfigProperty('basemap', 'lightPreset', lp || 'dusk'); } catch (e) {}
+  try { map.setConfigProperty('basemap', 'showPointOfInterestLabels', false); } catch (e) {}
+  try { map.setConfigProperty('basemap', 'showPlaceLabels', false); } catch (e) {}
+  try { map.setConfigProperty('basemap', 'showRoadLabels', false); } catch (e) {}
+  try { map.setConfigProperty('basemap', 'showTransitLabels', false); } catch (e) {}
 }
 
 // ---- Apply Theme Paint ----
@@ -346,7 +336,7 @@ function initPreviewMap() {
 
   previewMap = new mapboxgl.Map({
     container: 'mapPreview',
-    style: makeBasemapConfig(cfg.lightPreset),
+    style: STANDARD_STYLE,
     center: [cfg.lon, cfg.lat],
     zoom: cfg.zoom,
     pitch: cfg.pitch,
@@ -357,10 +347,9 @@ function initPreviewMap() {
   });
 
   previewMap.on('style.load', () => {
+    applyBasemapConfig(previewMap, cfg.lightPreset);
     const activeTheme = selectedThemes[0] || null;
-    if (activeTheme) {
-      applyThemePaint(previewMap, activeTheme);
-    }
+    if (activeTheme) applyThemePaint(previewMap, activeTheme);
   });
 
   previewMap.on('move', () => {
@@ -391,11 +380,9 @@ function capture3DMap() {
       captureMap = null;
     }
 
-    const captureStyle = makeBasemapConfig(cfg.lightPreset);
-
     captureMap = new mapboxgl.Map({
       container: 'captureMap',
-      style: captureStyle,
+      style: STANDARD_STYLE,
       center: [cfg.lon, cfg.lat],
       zoom: cfg.zoom,
       pitch: cfg.pitch,
@@ -409,13 +396,9 @@ function capture3DMap() {
     let captured = false;
 
     captureMap.on('style.load', () => {
-      // Force dark background
-      try {
-        captureMap.setConfigProperty('basemap', 'colorBackground', '#050505');
-      } catch (e) {}
-      if (activeTheme) {
-        applyThemePaint(captureMap, activeTheme);
-      }
+      applyBasemapConfig(captureMap, cfg.lightPreset);
+      try { captureMap.setConfigProperty('basemap', 'colorBackground', '#050505'); } catch (e) {}
+      if (activeTheme) applyThemePaint(captureMap, activeTheme);
     });
 
     captureMap.on('idle', () => {
