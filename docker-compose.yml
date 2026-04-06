@@ -9,6 +9,7 @@ services:
       - ./overlays_cache:/app/overlays_cache
       - ./badges:/app/badges
       - ./u2net:/root/.u2net
+      - ./custom_themes:/app/custom_themes
       # To use custom fonts, uncomment and place .ttf files in ./fonts/
       # - ./fonts:/app/fonts
     environment:
