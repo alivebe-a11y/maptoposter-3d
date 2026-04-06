@@ -10,11 +10,11 @@ services:
       - ./badges:/app/badges
       - ./u2net:/root/.u2net
       - ./custom_themes:/app/custom_themes
-      # Stadiums data — choose ONE of the two options below:
-      # Option A: mount the specific JSON file directly
-      #   - /path/to/stadiums.json:/app/stadiums.json
-      # Option B: mount the folder and set STADIUMS_FILE env var below
+      # Stadiums data (place stadiums.json next to docker-compose.yml):
+      - ./stadiums.json:/app/stadiums.json
+      # Or to use a file from another location, comment the line above and use:
       #   - /path/to/stadiums_folder:/app/stadiums_data
+      #   then set STADIUMS_FILE=/app/stadiums_data/your_file.json below
       # To use custom fonts, uncomment and place .ttf files in ./fonts/
       # - ./fonts:/app/fonts
     environment:
