@@ -1,0 +1,3 @@
+Based on Minimal Dark style by Musthaq Ahamad (haxzie).
+https://github.com/haxzie/stylebox
+MIT License

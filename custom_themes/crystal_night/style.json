@@ -1,0 +1,15 @@
+{
+  "name": "Crystal Night",
+  "description": "Dark navy with teal crystal highlights - sleek urban night aesthetic",
+  "bg": "#1A2535",
+  "text": "#B8D8D8",
+  "gradient_color": "#1A2535",
+  "water": "#131C2A",
+  "parks": "#1C6868",
+  "road_motorway": "#3A4A5A",
+  "road_primary": "#324258",
+  "road_secondary": "#2A3848",
+  "road_tertiary": "#243040",
+  "road_residential": "#1E2838",
+  "road_default": "#2A3848"
+}

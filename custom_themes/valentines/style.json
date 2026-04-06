@@ -1,0 +1,15 @@
+{
+  "name": "Valentine's",
+  "description": "Soft pink palette with muted rose tones - colorblind-friendly Valentine's Day aesthetic",
+  "bg": "#F1E4E8",
+  "text": "#2D2D34",
+  "gradient_color": "#F1E4E8",
+  "water": "#CEB1BE",
+  "parks": "#E2DCDE",
+  "road_motorway": "#FFFFFF",
+  "road_primary": "#FFF9F0",
+  "road_secondary": "#F5EAE0",
+  "road_tertiary": "#EDD8CC",
+  "road_residential": "#E8D0C4",
+  "road_default": "#EDD8CC"
+}

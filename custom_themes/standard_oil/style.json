@@ -1,0 +1,15 @@
+{
+  "name": "Standard Oil Company",
+  "description": "Vintage highway road map aesthetic - warm parchment with deep navy water and bold Standard Oil red roads",
+  "bg": "#EFE8D7",
+  "text": "#31339E",
+  "gradient_color": "#EFE8D7",
+  "water": "#1F2041",
+  "parks": "#C6B5B5",
+  "road_motorway": "#D14545",
+  "road_primary": "#D14545",
+  "road_secondary": "#D14747",
+  "road_tertiary": "#D14747",
+  "road_residential": "#CC4444",
+  "road_default": "#D14747"
+}

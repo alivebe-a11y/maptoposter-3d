@@ -1,0 +1,15 @@
+{
+  "name": "16th Century Map",
+  "description": "Antique parchment cartography - aged paper with sepia ink and faded maritime blues",
+  "bg": "#E8D9B0",
+  "text": "#3D2008",
+  "gradient_color": "#E8D9B0",
+  "water": "#A8C4BE",
+  "parks": "#C8CCA0",
+  "road_motorway": "#5C3010",
+  "road_primary": "#6B4018",
+  "road_secondary": "#8B5828",
+  "road_tertiary": "#A87848",
+  "road_residential": "#C09870",
+  "road_default": "#A87848"
+}

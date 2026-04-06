@@ -1,0 +1,15 @@
+{
+  "name": "Darcula",
+  "description": "Deep indigo-blue background with bright green parks - developer dark theme aesthetic",
+  "bg": "#2B2D42",
+  "text": "#FFFFFF",
+  "gradient_color": "#2B2D42",
+  "water": "#22243A",
+  "parks": "#00AA77",
+  "road_motorway": "#545878",
+  "road_primary": "#484C6E",
+  "road_secondary": "#3C4062",
+  "road_tertiary": "#323558",
+  "road_residential": "#2A2D4E",
+  "road_default": "#3C4062"
+}

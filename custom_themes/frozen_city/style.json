@@ -1,0 +1,15 @@
+{
+  "name": "Frozen City",
+  "description": "Pale ice-white with soft sky blue water - crisp frozen winter aesthetic",
+  "bg": "#EFF4F5",
+  "text": "#505A60",
+  "gradient_color": "#EFF4F5",
+  "water": "#B8D8E0",
+  "parks": "#C8D8B0",
+  "road_motorway": "#7A8A98",
+  "road_primary": "#8E9EAC",
+  "road_secondary": "#A4B2BC",
+  "road_tertiary": "#BCC8D0",
+  "road_residential": "#D0D8DC",
+  "road_default": "#A4B2BC"
+}

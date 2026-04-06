@@ -1,0 +1,15 @@
+{
+  "name": "Minimal Dark",
+  "description": "Two-tone dark navy - subtle land/ocean distinction, stripped back to pure form",
+  "bg": "#323648",
+  "text": "#6A7090",
+  "gradient_color": "#323648",
+  "water": "#272B3E",
+  "parks": "#3A3F58",
+  "road_motorway": "#585E78",
+  "road_primary": "#4E5470",
+  "road_secondary": "#444A65",
+  "road_tertiary": "#3C4260",
+  "road_residential": "#363C58",
+  "road_default": "#444A65"
+}

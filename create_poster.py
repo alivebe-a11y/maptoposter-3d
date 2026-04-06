@@ -12,6 +12,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 FONTS_DIR = os.path.join(BASE_DIR, 'fonts')
 POSTERS_DIR = os.path.join(BASE_DIR, 'posters')
 THEMES_DIR = os.path.join(BASE_DIR, 'themes')
+CUSTOM_THEMES_DIR = os.path.join(BASE_DIR, 'custom_themes')
 STADIUMS_FILE = os.path.join(BASE_DIR, 'stadiums.json')
 
 DPI = 500
@@ -26,11 +27,17 @@ TEXT_AREA_TOP = MAP_HEIGHT
 
 
 def load_theme(theme_name):
-    path = os.path.join(THEMES_DIR, f'{theme_name}.json')
-    if not os.path.exists(path):
-        raise FileNotFoundError(f'Theme not found: {theme_name}')
-    with open(path) as f:
-        return json.load(f)
+    # Check built-in flat themes first
+    flat = os.path.join(THEMES_DIR, f'{theme_name}.json')
+    if os.path.exists(flat):
+        with open(flat) as f:
+            return json.load(f)
+    # Fall back to custom themes directory
+    custom = os.path.join(CUSTOM_THEMES_DIR, theme_name, 'style.json')
+    if os.path.exists(custom):
+        with open(custom) as f:
+            return json.load(f)
+    raise FileNotFoundError(f'Theme not found: {theme_name}')
 
 
 def load_stadiums():

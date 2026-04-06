@@ -13,6 +13,7 @@ log = logging.getLogger(__name__)
 BASE_DIR = os.getcwd()
 POSTER_DIR = os.path.join(BASE_DIR, 'posters')
 THEME_DIR = os.path.join(BASE_DIR, 'themes')
+CUSTOM_THEME_DIR = os.path.join(BASE_DIR, 'custom_themes')
 OVERLAY_CACHE_DIR = os.path.join(BASE_DIR, 'overlays_cache')
 BADGES_DIR = os.path.join(BASE_DIR, 'badges')
 # Allow stadiums.json override via mounted file, fallback to baked-in copy
@@ -42,11 +43,31 @@ def load_stadiums():
 
 def load_themes():
     themes = []
+    # Built-in flat themes: themes/{name}.json
     if os.path.exists(THEME_DIR):
         for f in sorted(os.listdir(THEME_DIR)):
             if f.endswith('.json'):
                 themes.append(f.replace('.json', ''))
+    # Custom themes: custom_themes/{name}/style.json
+    if os.path.exists(CUSTOM_THEME_DIR):
+        for d in sorted(os.listdir(CUSTOM_THEME_DIR)):
+            style_path = os.path.join(CUSTOM_THEME_DIR, d, 'style.json')
+            if os.path.isdir(os.path.join(CUSTOM_THEME_DIR, d)) and os.path.exists(style_path):
+                themes.append(d)
     return themes
+
+
+def load_theme_data(theme_name):
+    """Return parsed theme JSON for a given theme name, checking both locations."""
+    flat = os.path.join(THEME_DIR, f'{theme_name}.json')
+    if os.path.exists(flat):
+        with open(flat) as f:
+            return json.load(f)
+    custom = os.path.join(CUSTOM_THEME_DIR, theme_name, 'style.json')
+    if os.path.exists(custom):
+        with open(custom) as f:
+            return json.load(f)
+    raise FileNotFoundError(f'Theme not found: {theme_name}')
 
 
 @app.route('/')
@@ -61,8 +82,7 @@ def index():
     themes_json = {}
     for t in themes:
         try:
-            with open(os.path.join(THEME_DIR, f'{t}.json')) as f:
-                themes_json[t] = json.load(f)
+            themes_json[t] = load_theme_data(t)
         except Exception as e:
             log.warning('Failed to load theme %s: %s', t, e)
     return render_template('index.html',

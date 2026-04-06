@@ -1,0 +1,15 @@
+{
+  "name": "Cyberpunk 2077",
+  "description": "Pure black with blazing yellow motorways and hot pink roads - Night City vibes",
+  "bg": "#0A0A0A",
+  "text": "#FFE000",
+  "gradient_color": "#0A0A0A",
+  "water": "#12122A",
+  "parks": "#3A1838",
+  "road_motorway": "#FFE000",
+  "road_primary": "#FF1493",
+  "road_secondary": "#CC1177",
+  "road_tertiary": "#993355",
+  "road_residential": "#661133",
+  "road_default": "#993355"
+}

@@ -1,0 +1,15 @@
+{
+  "name": "Uber",
+  "description": "Clean light streets with soft green parks and teal water - crisp navigation aesthetic",
+  "bg": "#F8F8F0",
+  "text": "#404040",
+  "gradient_color": "#F8F8F0",
+  "water": "#C0DCD8",
+  "parks": "#A8D8A0",
+  "road_motorway": "#FFFFFF",
+  "road_primary": "#F0F0E8",
+  "road_secondary": "#E0E0D8",
+  "road_tertiary": "#D0D0C8",
+  "road_residential": "#C8C8C0",
+  "road_default": "#D0D0C8"
+}

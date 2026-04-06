@@ -1,0 +1,15 @@
+{
+  "name": "Dusk",
+  "description": "Near-monochrome dark blue-grey - ultra minimal twilight urban aesthetic",
+  "bg": "#1E2530",
+  "text": "#7A8A9A",
+  "gradient_color": "#1E2530",
+  "water": "#161D28",
+  "parks": "#1A2230",
+  "road_motorway": "#FFFFFF",
+  "road_primary": "#4A5560",
+  "road_secondary": "#3A4550",
+  "road_tertiary": "#2E3844",
+  "road_residential": "#252E38",
+  "road_default": "#3A4550"
+}
