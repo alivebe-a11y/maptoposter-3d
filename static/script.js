@@ -18,6 +18,7 @@ const _CAPTURE_HALF = 4096 / 2;
 const _TILE = 512;
 
 function distanceToZoom(distanceMeters, lat) {
+  if (distanceMeters <= 0) return 22; // 0 m = maximum zoom
   const latRad = (lat || 51.5) * Math.PI / 180;
   const zoom = Math.log2(_CAPTURE_HALF * _EARTH_CIRC * Math.cos(latRad) / (_TILE * distanceMeters));
   return Math.max(8, Math.min(22, parseFloat(zoom.toFixed(1))));
@@ -191,11 +192,12 @@ function fillStadiumData(s) {
   setFieldValue('lat', s.lat);
   setFieldValue('lon', s.lon);
 
-  // Convert default zoom to distance for the distance slider
+  // Convert default zoom to distance for the distance slider + number input
   const dist = zoomToDistance(zoom, s.lat);
   const distEl = document.getElementById('distanceSlider');
-  const distDisp = document.getElementById('distanceSliderVal');
-  if (distEl) { distEl.value = dist; if (distDisp) distDisp.textContent = formatDistance(dist); }
+  const distIn = document.getElementById('distanceInput');
+  if (distEl) distEl.value = dist;
+  if (distIn) distIn.value = dist;
 
   setSliderValue('pitchSlider', pitch);
   setSliderValue('bearingSlider', bearing);
@@ -218,8 +220,12 @@ function setSliderValue(id, val) {
   const el = document.getElementById(id);
   if (!el) return;
   el.value = val;
-  const display = document.getElementById(id + 'Val');
-  if (display) display.textContent = val;
+  // Also update the paired number input
+  const pair = SLIDER_INPUT_PAIRS.find(p => p.slider === id);
+  if (pair) {
+    const inEl = document.getElementById(pair.input);
+    if (inEl) inEl.value = val;
+  }
 }
 
 // ---- City / Town / Village Geocoder ----
@@ -285,26 +291,43 @@ function showGeocodeResults(features) {
 }
 
 // ---- Sliders ----
-function initSliders() {
-  // Distance slider: display as km
-  const distEl = document.getElementById('distanceSlider');
-  const distDisp = document.getElementById('distanceSliderVal');
-  if (distEl) {
-    distEl.addEventListener('input', () => {
-      if (distDisp) distDisp.textContent = formatDistance(parseInt(distEl.value, 10));
-      syncPreviewMap();
-    });
-  }
+// Each slider is paired with a number input for precise manual entry.
+// They are kept in sync bidirectionally.
+const SLIDER_INPUT_PAIRS = [
+  { slider: 'distanceSlider', input: 'distanceInput', min: 0,    max: 30000, step: 100 },
+  { slider: 'pitchSlider',    input: 'pitchInput',    min: 0,    max: 85,    step: 1   },
+  { slider: 'bearingSlider',  input: 'bearingInput',  min: -180, max: 180,   step: 1   },
+];
 
-  // Pitch and bearing sliders
-  ['pitchSlider', 'bearingSlider'].forEach(id => {
-    const el = document.getElementById(id);
-    if (!el) return;
-    const display = document.getElementById(id + 'Val');
-    el.addEventListener('input', () => {
-      if (display) display.textContent = el.value;
+function clamp(val, min, max) { return Math.min(max, Math.max(min, val)); }
+
+function initSliders() {
+  SLIDER_INPUT_PAIRS.forEach(({ slider, input, min, max }) => {
+    const slEl = document.getElementById(slider);
+    const inEl = document.getElementById(input);
+    if (!slEl) return;
+
+    // Slider → input
+    slEl.addEventListener('input', () => {
+      if (inEl) inEl.value = slEl.value;
       syncPreviewMap();
     });
+
+    // Input → slider (on change/enter, clamped to valid range)
+    if (inEl) {
+      inEl.addEventListener('input', () => {
+        const v = clamp(parseFloat(inEl.value) || 0, min, max);
+        slEl.value = v;
+        inEl.value = v;
+        syncPreviewMap();
+      });
+      inEl.addEventListener('change', () => {
+        const v = clamp(parseFloat(inEl.value) || 0, min, max);
+        slEl.value = v;
+        inEl.value = v;
+        syncPreviewMap();
+      });
+    }
   });
 }
 
@@ -338,7 +361,7 @@ function get3DConfig() {
   const lonVal = parseFloat(document.getElementById('lon')?.value);
   const lat = isNaN(latVal) ? 51.5 : latVal;
   const lon = isNaN(lonVal) ? 0 : lonVal;
-  const distance = parseInt(document.getElementById('distanceSlider')?.value || 3000, 10);
+  const distance = parseInt(document.getElementById('distanceInput')?.value ?? document.getElementById('distanceSlider')?.value ?? 3000, 10);
   return {
     lat,
     lon,
@@ -474,21 +497,24 @@ function initPreviewMap() {
       setFieldValue('lat', c.lat.toFixed(5));
       setFieldValue('lon', c.lng.toFixed(5));
 
-      // Convert live zoom → distance and update slider
+      // Convert live zoom → distance; update slider + paired number input
       const currentZoom = previewMap.getZoom();
       const dist = zoomToDistance(currentZoom, c.lat);
       const dv = document.getElementById('distanceSlider');
-      const dvd = document.getElementById('distanceSliderVal');
-      if (dv) { dv.value = dist; if (dvd) dvd.textContent = formatDistance(dist); }
+      const di = document.getElementById('distanceInput');
+      if (dv) dv.value = dist;
+      if (di) di.value = dist;
 
       const pitch = previewMap.getPitch().toFixed(0);
       const bearing = previewMap.getBearing().toFixed(0);
       const pv = document.getElementById('pitchSlider');
-      const pvd = document.getElementById('pitchSliderVal');
-      if (pv) { pv.value = pitch; if (pvd) pvd.textContent = pitch; }
+      const pi = document.getElementById('pitchInput');
+      if (pv) pv.value = pitch;
+      if (pi) pi.value = pitch;
       const bv = document.getElementById('bearingSlider');
-      const bvd = document.getElementById('bearingSliderVal');
-      if (bv) { bv.value = bearing; if (bvd) bvd.textContent = bearing; }
+      const bi = document.getElementById('bearingInput');
+      if (bv) bv.value = bearing;
+      if (bi) bi.value = bearing;
     } finally {
       syncingFromMap = false;
     }

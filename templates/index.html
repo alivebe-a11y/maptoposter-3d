@@ -105,16 +105,24 @@
         <div class="slider-row">
           <div class="slider-label-row">
             <label for="distanceSlider">Distance</label>
-            <span class="slider-value" id="distanceSliderVal">3.0 km</span>
+            <div class="slider-input-wrap">
+              <input type="number" class="slider-num-input" id="distanceInput"
+                     min="0" max="30000" step="100" value="3000" />
+              <span class="slider-unit">m</span>
+            </div>
           </div>
-          <input type="range" id="distanceSlider" min="1000" max="30000" step="500" value="3000" />
+          <input type="range" id="distanceSlider" min="0" max="30000" step="100" value="3000" />
         </div>
 
         <!-- Pitch -->
         <div class="slider-row">
           <div class="slider-label-row">
             <label for="pitchSlider">Pitch</label>
-            <span class="slider-value" id="pitchSliderVal">55</span>
+            <div class="slider-input-wrap">
+              <input type="number" class="slider-num-input" id="pitchInput"
+                     min="0" max="85" step="1" value="55" />
+              <span class="slider-unit">°</span>
+            </div>
           </div>
           <input type="range" id="pitchSlider" min="0" max="85" step="1" value="55" />
         </div>
@@ -123,7 +131,11 @@
         <div class="slider-row">
           <div class="slider-label-row">
             <label for="bearingSlider">Bearing</label>
-            <span class="slider-value" id="bearingSliderVal">0</span>
+            <div class="slider-input-wrap">
+              <input type="number" class="slider-num-input" id="bearingInput"
+                     min="-180" max="180" step="1" value="0" />
+              <span class="slider-unit">°</span>
+            </div>
           </div>
           <input type="range" id="bearingSlider" min="-180" max="180" step="1" value="0" />
         </div>
