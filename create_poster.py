@@ -6,8 +6,7 @@ import os
 import json
 import argparse
 from datetime import datetime
-from PIL import Image, ImageDraw, ImageFont, ImageFilter
-import numpy as np
+from PIL import Image, ImageDraw, ImageFont
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 FONTS_DIR = os.path.join(BASE_DIR, 'fonts')
@@ -28,11 +27,16 @@ TEXT_AREA_TOP = MAP_HEIGHT
 
 def load_theme(theme_name):
     path = os.path.join(THEMES_DIR, f'{theme_name}.json')
+    if not os.path.exists(path):
+        raise FileNotFoundError(f'Theme not found: {theme_name}')
     with open(path) as f:
         return json.load(f)
 
 
 def load_stadiums():
+    if not os.path.exists(STADIUMS_FILE):
+        print(f'Warning: stadiums.json not found at {STADIUMS_FILE}')
+        return []
     with open(STADIUMS_FILE) as f:
         return json.load(f)
 
@@ -41,29 +45,11 @@ def load_fonts():
     bold = os.path.join(FONTS_DIR, 'Roboto-Bold.ttf')
     regular = os.path.join(FONTS_DIR, 'Roboto-Regular.ttf')
     light = os.path.join(FONTS_DIR, 'Roboto-Light.ttf')
-    fonts_exist = all(os.path.exists(p) for p in [bold, regular, light])
-    if fonts_exist:
-        return {
-            'bold': bold,
-            'regular': regular,
-            'light': light
-        }
-    return None
-
-
-def create_gradient_fade(width, height, color, direction='bottom'):
-    """Create a gradient fade image."""
-    gradient = Image.new('RGBA', (width, height), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(gradient)
-    r, g, b = tuple(int(color.lstrip('#')[i:i+2], 16) for i in (0, 2, 4))
-    steps = height
-    for i in range(steps):
-        if direction == 'bottom':
-            alpha = int(255 * (i / steps) ** 1.5)
-        else:
-            alpha = int(255 * ((steps - i) / steps) ** 1.5)
-        draw.line([(0, i), (width, i)], fill=(r, g, b, alpha))
-    return gradient
+    missing = [p for p in [bold, regular, light] if not os.path.exists(p)]
+    if missing:
+        print(f'Warning: fonts missing from {FONTS_DIR}: {[os.path.basename(p) for p in missing]}')
+        return None
+    return {'bold': bold, 'regular': regular, 'light': light}
 
 
 def hex_to_rgb(hex_color):
@@ -185,7 +171,7 @@ def create_poster(theme_name, stadium_name='', capture_path=None, badge_path=Non
 
     # Attribution
     draw.text((WIDTH_PX - 300, attr_y), 'BlueBearLabs',
-              font=font_small, fill=(tr, tg, tb, 153), anchor='rm')
+              font=font_small, fill=(tr, tg, tb), anchor='rm')
 
     # Save
     os.makedirs(POSTERS_DIR, exist_ok=True)

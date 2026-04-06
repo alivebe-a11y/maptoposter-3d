@@ -8,6 +8,7 @@ let captureMap = null;
 let selectedThemes = [];
 let lightPreset = 'dusk';
 let overlaySize = 'medium';
+let syncingFromMap = false; // guard: prevents map→slider→syncPreviewMap loop
 
 // ---- Init ----
 document.addEventListener('DOMContentLoaded', () => {
@@ -230,12 +231,14 @@ function initSizeButtons() {
 
 // ---- 3D Config ----
 function get3DConfig() {
+  const latVal = parseFloat(document.getElementById('lat')?.value);
+  const lonVal = parseFloat(document.getElementById('lon')?.value);
   return {
-    lat: parseFloat(document.getElementById('lat')?.value || 0),
-    lon: parseFloat(document.getElementById('lon')?.value || 0),
-    zoom: parseFloat(document.getElementById('zoomSlider')?.value || 16.5),
-    pitch: parseFloat(document.getElementById('pitchSlider')?.value || 55),
-    bearing: parseFloat(document.getElementById('bearingSlider')?.value || 0),
+    lat: isNaN(latVal) ? 0 : latVal,
+    lon: isNaN(lonVal) ? 0 : lonVal,
+    zoom: parseFloat(document.getElementById('zoomSlider')?.value) || 16.5,
+    pitch: parseFloat(document.getElementById('pitchSlider')?.value) || 55,
+    bearing: parseFloat(document.getElementById('bearingSlider')?.value) || 0,
     lightPreset,
     overlaySize
   };
@@ -290,8 +293,9 @@ function applyThemePaint(map, themeName) {
 
 // ---- Preview Map ----
 function syncPreviewMap() {
-  if (!previewMap) return;
+  if (!previewMap || syncingFromMap) return;
   const cfg = get3DConfig();
+  if (!cfg.lat || !cfg.lon) return;
   previewMap.setCenter([cfg.lon, cfg.lat]);
   previewMap.setZoom(cfg.zoom);
   previewMap.setPitch(cfg.pitch);
@@ -353,18 +357,26 @@ function initPreviewMap() {
   });
 
   previewMap.on('move', () => {
-    const c = previewMap.getCenter();
-    setFieldValue('lat', c.lat.toFixed(5));
-    setFieldValue('lon', c.lng.toFixed(5));
-    const zv = document.getElementById('zoomSlider');
-    const zvd = document.getElementById('zoomSliderVal');
-    if (zv) { zv.value = previewMap.getZoom().toFixed(1); if (zvd) zvd.textContent = previewMap.getZoom().toFixed(1); }
-    const pv = document.getElementById('pitchSlider');
-    const pvd = document.getElementById('pitchSliderVal');
-    if (pv) { pv.value = previewMap.getPitch().toFixed(0); if (pvd) pvd.textContent = previewMap.getPitch().toFixed(0); }
-    const bv = document.getElementById('bearingSlider');
-    const bvd = document.getElementById('bearingSliderVal');
-    if (bv) { bv.value = previewMap.getBearing().toFixed(0); if (bvd) bvd.textContent = previewMap.getBearing().toFixed(0); }
+    syncingFromMap = true;
+    try {
+      const c = previewMap.getCenter();
+      setFieldValue('lat', c.lat.toFixed(5));
+      setFieldValue('lon', c.lng.toFixed(5));
+      const zoom = previewMap.getZoom().toFixed(1);
+      const pitch = previewMap.getPitch().toFixed(0);
+      const bearing = previewMap.getBearing().toFixed(0);
+      const zv = document.getElementById('zoomSlider');
+      const zvd = document.getElementById('zoomSliderVal');
+      if (zv) { zv.value = zoom; if (zvd) zvd.textContent = zoom; }
+      const pv = document.getElementById('pitchSlider');
+      const pvd = document.getElementById('pitchSliderVal');
+      if (pv) { pv.value = pitch; if (pvd) pvd.textContent = pitch; }
+      const bv = document.getElementById('bearingSlider');
+      const bvd = document.getElementById('bearingSliderVal');
+      if (bv) { bv.value = bearing; if (bvd) bvd.textContent = bearing; }
+    } finally {
+      syncingFromMap = false;
+    }
   });
 }
 

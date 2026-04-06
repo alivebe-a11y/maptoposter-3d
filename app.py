@@ -2,10 +2,13 @@ import os
 import glob
 import json
 import base64
+import logging
 import subprocess
 from flask import Flask, render_template, request, jsonify, send_from_directory
 
 app = Flask(__name__)
+logging.basicConfig(level=logging.INFO, format='%(levelname)s %(name)s: %(message)s')
+log = logging.getLogger(__name__)
 
 BASE_DIR = os.getcwd()
 POSTER_DIR = os.path.join(BASE_DIR, 'posters')
@@ -26,7 +29,14 @@ def load_stadiums():
     try:
         with open(STADIUMS_FILE) as f:
             return json.load(f)
-    except Exception:
+    except FileNotFoundError:
+        log.warning('stadiums.json not found at %s', STADIUMS_FILE)
+        return []
+    except json.JSONDecodeError as e:
+        log.error('Invalid JSON in stadiums file: %s', e)
+        return []
+    except Exception as e:
+        log.error('Failed to load stadiums: %s', e)
         return []
 
 
@@ -53,8 +63,8 @@ def index():
         try:
             with open(os.path.join(THEME_DIR, f'{t}.json')) as f:
                 themes_json[t] = json.load(f)
-        except Exception:
-            pass
+        except Exception as e:
+            log.warning('Failed to load theme %s: %s', t, e)
     return render_template('index.html',
                            themes=themes,
                            themes_json=json.dumps(themes_json),
