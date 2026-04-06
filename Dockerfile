@@ -12,23 +12,26 @@ ENV PATH="/opt/venv/bin:$PATH"
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Download Roboto fonts using Python (no extra tools needed, follows redirects)
+RUN python -c "
+import urllib.request, os
+os.makedirs('/app/fonts', exist_ok=True)
+base = 'https://raw.githubusercontent.com/google/fonts/main/apache/roboto/static/'
+for f in ['Roboto-Bold.ttf', 'Roboto-Regular.ttf', 'Roboto-Light.ttf']:
+    print('Downloading', f)
+    urllib.request.urlretrieve(base + f, '/app/fonts/' + f)
+print('Fonts ready')
+"
+
 FROM python:3.11-slim
 
 WORKDIR /app
 
 COPY --from=builder /opt/venv /opt/venv
+COPY --from=builder /app/fonts /app/fonts
 COPY . .
 
-RUN mkdir -p /app/posters /app/overlays_cache /app/badges /app/fonts
-
-# Download Roboto fonts so the image works out-of-the-box without a fonts volume mount
-RUN apt-get update && apt-get install -y --no-install-recommends wget ca-certificates \
-    && wget -q -P /app/fonts \
-        "https://github.com/google/fonts/raw/main/apache/roboto/static/Roboto-Bold.ttf" \
-        "https://github.com/google/fonts/raw/main/apache/roboto/static/Roboto-Regular.ttf" \
-        "https://github.com/google/fonts/raw/main/apache/roboto/static/Roboto-Light.ttf" \
-    && apt-get purge -y wget && apt-get autoremove -y \
-    && rm -rf /var/lib/apt/lists/*
+RUN mkdir -p /app/posters /app/overlays_cache /app/badges
 
 ENV PATH="/opt/venv/bin:$PATH"
 
