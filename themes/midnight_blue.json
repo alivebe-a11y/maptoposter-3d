@@ -1,14 +1,15 @@
 {
   "name": "Midnight Blue",
-  "bg": "#05103a",
-  "text": "#f5c842",
-  "gradient_color": "#05103a",
-  "mapbox_paint": {
-    "background": "#05103a",
-    "water": "#0a1f5c",
-    "park": "#081840",
-    "road_major": "#f5c842",
-    "road_minor": "#c8a030",
-    "building": "#0d2060"
-  }
+  "description": "Deep navy background with gold/copper roads - luxury atlas aesthetic",
+  "bg": "#0A1628",
+  "text": "#D4AF37",
+  "gradient_color": "#0A1628",
+  "water": "#061020",
+  "parks": "#0F2235",
+  "road_motorway": "#D4AF37",
+  "road_primary": "#C9A227",
+  "road_secondary": "#A8893A",
+  "road_tertiary": "#8B7355",
+  "road_residential": "#6B5B4F",
+  "road_default": "#8B7355"
 }

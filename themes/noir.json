@@ -1,14 +1,15 @@
 {
   "name": "Noir",
-  "bg": "#0a0a0a",
-  "text": "#ffffff",
-  "gradient_color": "#0a0a0a",
-  "mapbox_paint": {
-    "background": "#0a0a0a",
-    "water": "#111111",
-    "park": "#141414",
-    "road_major": "#ffffff",
-    "road_minor": "#aaaaaa",
-    "building": "#1e1e1e"
-  }
+  "description": "Pure black background with white/gray roads - modern gallery aesthetic",
+  "bg": "#000000",
+  "text": "#FFFFFF",
+  "gradient_color": "#000000",
+  "water": "#0A0A0A",
+  "parks": "#111111",
+  "road_motorway": "#FFFFFF",
+  "road_primary": "#E0E0E0",
+  "road_secondary": "#B0B0B0",
+  "road_tertiary": "#808080",
+  "road_residential": "#505050",
+  "road_default": "#808080"
 }

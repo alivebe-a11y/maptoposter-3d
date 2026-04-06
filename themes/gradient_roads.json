@@ -1,14 +1,15 @@
 {
   "name": "Gradient Roads",
-  "bg": "#080810",
-  "text": "#9080ff",
-  "gradient_color": "#080810",
-  "mapbox_paint": {
-    "background": "#080810",
-    "water": "#0a0c20",
-    "park": "#0c0e18",
-    "road_major": "#6040e0",
-    "road_minor": "#8060ff",
-    "building": "#0e1020"
-  }
+  "description": "Smooth gradient from dark center to light edges with subtle features",
+  "bg": "#FFFFFF",
+  "text": "#000000",
+  "gradient_color": "#FFFFFF",
+  "water": "#D5D5D5",
+  "parks": "#EFEFEF",
+  "road_motorway": "#050505",
+  "road_primary": "#151515",
+  "road_secondary": "#2A2A2A",
+  "road_tertiary": "#404040",
+  "road_residential": "#555555",
+  "road_default": "#404040"
 }

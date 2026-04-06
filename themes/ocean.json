@@ -1,14 +1,15 @@
 {
   "name": "Ocean",
-  "bg": "#05202e",
-  "text": "#80e0f0",
-  "gradient_color": "#05202e",
-  "mapbox_paint": {
-    "background": "#05202e",
-    "water": "#0a3a50",
-    "park": "#0a2a38",
-    "road_major": "#80e0f0",
-    "road_minor": "#50b8d0",
-    "building": "#0e3048"
-  }
+  "description": "Various blues and teals - perfect for coastal cities",
+  "bg": "#F0F8FA",
+  "text": "#1A5F7A",
+  "gradient_color": "#F0F8FA",
+  "water": "#B8D8E8",
+  "parks": "#D8EAE8",
+  "road_motorway": "#1A5F7A",
+  "road_primary": "#2A7A9A",
+  "road_secondary": "#4A9AB8",
+  "road_tertiary": "#70B8D0",
+  "road_residential": "#A0D0E0",
+  "road_default": "#4A9AB8"
 }
