@@ -12,7 +12,9 @@ POSTER_DIR = os.path.join(BASE_DIR, 'posters')
 THEME_DIR = os.path.join(BASE_DIR, 'themes')
 OVERLAY_CACHE_DIR = os.path.join(BASE_DIR, 'overlays_cache')
 BADGES_DIR = os.path.join(BASE_DIR, 'badges')
-STADIUMS_FILE = os.path.join(BASE_DIR, 'stadiums.json')
+# Allow stadiums.json override via mounted file, fallback to baked-in copy
+STADIUMS_FILE = os.environ.get('STADIUMS_FILE',
+    os.path.join(BASE_DIR, 'stadiums.json'))
 
 for d in [POSTER_DIR, OVERLAY_CACHE_DIR, BADGES_DIR]:
     os.makedirs(d, exist_ok=True)

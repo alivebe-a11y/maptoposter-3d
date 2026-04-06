@@ -8,7 +8,6 @@ services:
       - ./posters:/app/posters
       - ./overlays_cache:/app/overlays_cache
       - ./badges:/app/badges
-      - ./stadiums.json:/app/stadiums.json
       - ./fonts:/app/fonts
       - ./u2net:/root/.u2net
     environment:
