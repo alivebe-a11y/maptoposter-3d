@@ -79,6 +79,14 @@ def create_poster(theme_name, stadium_name='', capture_path=None, badge_path=Non
         map_img = map_img.resize((WIDTH_PX, MAP_HEIGHT), Image.Resampling.LANCZOS)
         canvas.paste(map_img, (0, 0))
 
+        # Apply semi-transparent theme colour tint over map area so each theme looks
+        # visually distinct (Mapbox Standard style doesn't support per-theme map colours,
+        # so the same capture is used for all themes in a batch — this tint differentiates them).
+        tint = Image.new('RGBA', (WIDTH_PX, MAP_HEIGHT), (r, g, b, 64))  # 25% opacity
+        canvas_rgba = canvas.convert('RGBA')
+        canvas_rgba.alpha_composite(tint, (0, 0))
+        canvas = canvas_rgba.convert('RGB')
+
         # Apply gradient fade at bottom of map
         fade_height = int(MAP_HEIGHT * 0.20)
         gradient_strip = Image.new('RGBA', (WIDTH_PX, fade_height))

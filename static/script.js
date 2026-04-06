@@ -137,6 +137,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (allSelected) selectedThemes = [];
     btn.textContent = allSelected ? 'Select All' : 'Clear All';
     updateThemeCount();
+    updateThemeOverlay(selectedThemes[0] || null);
   });
 });
 
@@ -361,40 +362,43 @@ function applyBasemapConfig(map, lp) {
   try { map.setConfigProperty('basemap', 'showTransitLabels', false); } catch (e) {}
 }
 
+// ---- Theme Preview Overlay ----
+// Applies a CSS colour tint matching the PIL compositor's 25%-opacity tint so
+// the user sees instant theme feedback on the preview map without re-rendering.
+function updateThemeOverlay(themeName) {
+  const overlay = document.getElementById('mapThemeOverlay');
+  const mapEl = document.getElementById('mapPreview');
+  if (!overlay) return;
+
+  if (!themeName || !window.THEMES || !window.THEMES[themeName]) {
+    overlay.style.display = 'none';
+    return;
+  }
+
+  const bg = window.THEMES[themeName].bg || '#000000';
+  // Convert hex to rgba at 25% opacity (matching PIL tint alpha 64/255 ≈ 25%)
+  const r = parseInt(bg.slice(1, 3), 16);
+  const g = parseInt(bg.slice(3, 5), 16);
+  const b = parseInt(bg.slice(5, 7), 16);
+  overlay.style.background = `rgba(${r},${g},${b},0.25)`;
+
+  // Only show overlay when map is visible
+  if (mapEl && mapEl.style.display !== 'none') {
+    overlay.style.display = 'block';
+  }
+}
+
 // ---- Apply Theme Paint ----
+// NOTE: Mapbox Standard style (v3) does NOT expose colour config properties
+// (colorBackground, colorWater, colorRoads, etc.) — those calls silently fail.
+// The only valid config properties are: lightPreset, showPointOfInterestLabels,
+// showPlaceLabels, showRoadLabels, showTransitLabels.
+// Theme colours are applied in the PIL compositor (create_poster.py) via a
+// per-theme colour tint over the captured map image.
+// This function is intentionally kept for custom-style compatibility if the
+// Standard style ever exposes these, but currently only updates the overlay.
 function applyThemePaint(map, themeName) {
-  if (!themeName || !window.THEMES) return;
-  const theme = window.THEMES[themeName];
-  if (!theme || !theme.mapbox_paint) return;
-  const paint = theme.mapbox_paint;
-
-  const safeSet = (layerId, prop, value) => {
-    try {
-      if (map.getLayer(layerId)) {
-        map.setPaintProperty(layerId, prop, value);
-      }
-    } catch (e) {}
-  };
-
-  // Background
-  if (paint.background) {
-    safeSet('land', 'background-color', paint.background);
-    try {
-      map.setConfigProperty('basemap', 'colorBackground', paint.background);
-    } catch (e) {}
-  }
-  if (paint.water) {
-    try { map.setConfigProperty('basemap', 'colorWater', paint.water); } catch (e) {}
-  }
-  if (paint.park) {
-    try { map.setConfigProperty('basemap', 'colorGreen', paint.park); } catch (e) {}
-  }
-  if (paint.road_major) {
-    try { map.setConfigProperty('basemap', 'colorRoads', paint.road_major); } catch (e) {}
-  }
-  if (paint.building) {
-    try { map.setConfigProperty('basemap', 'colorBuildings', paint.building); } catch (e) {}
-  }
+  updateThemeOverlay(themeName);
 }
 
 // ---- Preview Map ----
@@ -429,6 +433,7 @@ function initPreviewMap() {
   // Show the map container
   document.getElementById('previewPlaceholder').style.display = 'none';
   container.style.display = 'block';
+  updateThemeOverlay(selectedThemes[0] || null);
 
   if (previewMap) {
     previewMap.setCenter([cfg.lon, cfg.lat]);
