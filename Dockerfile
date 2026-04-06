@@ -13,15 +13,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Download Roboto fonts using Python (no extra tools needed, follows redirects)
-RUN python -c "
-import urllib.request, os
-os.makedirs('/app/fonts', exist_ok=True)
-base = 'https://raw.githubusercontent.com/google/fonts/main/apache/roboto/static/'
-for f in ['Roboto-Bold.ttf', 'Roboto-Regular.ttf', 'Roboto-Light.ttf']:
-    print('Downloading', f)
-    urllib.request.urlretrieve(base + f, '/app/fonts/' + f)
-print('Fonts ready')
-"
+RUN python -c "import urllib.request,os; os.makedirs('/app/fonts',exist_ok=True); base='https://raw.githubusercontent.com/google/fonts/main/apache/roboto/static/'; [urllib.request.urlretrieve(base+f,'/app/fonts/'+f) or print('Downloaded',f) for f in ('Roboto-Bold.ttf','Roboto-Regular.ttf','Roboto-Light.ttf')]"
 
 FROM python:3.11-slim
 
