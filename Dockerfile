@@ -12,15 +12,11 @@ ENV PATH="/opt/venv/bin:$PATH"
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Download Roboto fonts using Python (no extra tools needed, follows redirects)
-RUN python -c "import urllib.request,os; os.makedirs('/app/fonts',exist_ok=True); base='https://raw.githubusercontent.com/google/fonts/main/apache/roboto/static/'; [urllib.request.urlretrieve(base+f,'/app/fonts/'+f) or print('Downloaded',f) for f in ('Roboto-Bold.ttf','Roboto-Regular.ttf','Roboto-Light.ttf')]"
-
 FROM python:3.11-slim
 
 WORKDIR /app
 
 COPY --from=builder /opt/venv /opt/venv
-COPY --from=builder /app/fonts /app/fonts
 COPY . .
 
 RUN mkdir -p /app/posters /app/overlays_cache /app/badges
