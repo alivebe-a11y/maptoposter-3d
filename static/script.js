@@ -7,8 +7,31 @@ let previewMap = null;
 let captureMap = null;
 let selectedThemes = [];
 let lightPreset = 'dusk';
-let overlaySize = 'medium';
 let syncingFromMap = false; // guard: prevents map→slider→syncPreviewMap loop
+
+// ---- Distance ↔ Zoom Conversion ----
+// Formula based on 4096px capture canvas, Mapbox 512px tile size:
+//   visible_half_width = (captureSize/2) * (earthCirc * cos(lat)) / (tileSize * 2^zoom)
+//   Setting that equal to distanceMeters and solving for zoom gives:
+const _EARTH_CIRC = 40075016.686;
+const _CAPTURE_HALF = 4096 / 2;
+const _TILE = 512;
+
+function distanceToZoom(distanceMeters, lat) {
+  const latRad = (lat || 51.5) * Math.PI / 180;
+  const zoom = Math.log2(_CAPTURE_HALF * _EARTH_CIRC * Math.cos(latRad) / (_TILE * distanceMeters));
+  return Math.max(8, Math.min(22, parseFloat(zoom.toFixed(1))));
+}
+
+function zoomToDistance(zoom, lat) {
+  const latRad = (lat || 51.5) * Math.PI / 180;
+  const d = _CAPTURE_HALF * _EARTH_CIRC * Math.cos(latRad) / (_TILE * Math.pow(2, zoom));
+  return Math.round(Math.max(1000, Math.min(30000, d)));
+}
+
+function formatDistance(meters) {
+  return (meters / 1000).toFixed(1) + ' km';
+}
 
 // ---- Init ----
 document.addEventListener('DOMContentLoaded', () => {
@@ -160,21 +183,24 @@ function tryAutoFillStadium(name) {
 
 function fillStadiumData(s) {
   const dv = s.default_view || {};
+  const zoom = dv.zoom !== undefined ? dv.zoom : 16.5;
+  const pitch = dv.pitch !== undefined ? dv.pitch : 55;
+  const bearing = dv.bearing !== undefined ? dv.bearing : 0;
+
   setFieldValue('lat', s.lat);
   setFieldValue('lon', s.lon);
-  setSliderValue('zoomSlider', dv.zoom !== undefined ? dv.zoom : 16.5);
-  setSliderValue('pitchSlider', dv.pitch !== undefined ? dv.pitch : 55);
-  setSliderValue('bearingSlider', dv.bearing !== undefined ? dv.bearing : 0);
 
-  // Sync preview map if active
+  // Convert default zoom to distance for the distance slider
+  const dist = zoomToDistance(zoom, s.lat);
+  const distEl = document.getElementById('distanceSlider');
+  const distDisp = document.getElementById('distanceSliderVal');
+  if (distEl) { distEl.value = dist; if (distDisp) distDisp.textContent = formatDistance(dist); }
+
+  setSliderValue('pitchSlider', pitch);
+  setSliderValue('bearingSlider', bearing);
+
   if (previewMap) {
-    previewMap.flyTo({
-      center: [s.lon, s.lat],
-      zoom: dv.zoom !== undefined ? dv.zoom : 16.5,
-      pitch: dv.pitch !== undefined ? dv.pitch : 55,
-      bearing: dv.bearing !== undefined ? dv.bearing : 0,
-      duration: 1800
-    });
+    previewMap.flyTo({ center: [s.lon, s.lat], zoom, pitch, bearing, duration: 1800 });
   }
 }
 
@@ -259,8 +285,18 @@ function showGeocodeResults(features) {
 
 // ---- Sliders ----
 function initSliders() {
-  const sliders = ['zoomSlider', 'pitchSlider', 'bearingSlider'];
-  sliders.forEach(id => {
+  // Distance slider: display as km
+  const distEl = document.getElementById('distanceSlider');
+  const distDisp = document.getElementById('distanceSliderVal');
+  if (distEl) {
+    distEl.addEventListener('input', () => {
+      if (distDisp) distDisp.textContent = formatDistance(parseInt(distEl.value, 10));
+      syncPreviewMap();
+    });
+  }
+
+  // Pitch and bearing sliders
+  ['pitchSlider', 'bearingSlider'].forEach(id => {
     const el = document.getElementById(id);
     if (!el) return;
     const display = document.getElementById(id + 'Val');
@@ -299,10 +335,14 @@ function initBadgeScaleSlider() {
 function get3DConfig() {
   const latVal = parseFloat(document.getElementById('lat')?.value);
   const lonVal = parseFloat(document.getElementById('lon')?.value);
+  const lat = isNaN(latVal) ? 51.5 : latVal;
+  const lon = isNaN(lonVal) ? 0 : lonVal;
+  const distance = parseInt(document.getElementById('distanceSlider')?.value || 3000, 10);
   return {
-    lat: isNaN(latVal) ? 0 : latVal,
-    lon: isNaN(lonVal) ? 0 : lonVal,
-    zoom: parseFloat(document.getElementById('zoomSlider')?.value) || 16.5,
+    lat,
+    lon,
+    distance,
+    zoom: distanceToZoom(distance, lat),
     pitch: parseFloat(document.getElementById('pitchSlider')?.value) || 55,
     bearing: parseFloat(document.getElementById('bearingSlider')?.value) || 0,
     lightPreset,
@@ -361,7 +401,7 @@ function applyThemePaint(map, themeName) {
 function syncPreviewMap() {
   if (!previewMap || syncingFromMap) return;
   const cfg = get3DConfig();
-  if (!cfg.lat || !cfg.lon) return;
+  if (!cfg.lon) return;
   previewMap.setCenter([cfg.lon, cfg.lat]);
   previewMap.setZoom(cfg.zoom);
   previewMap.setPitch(cfg.pitch);
@@ -428,12 +468,16 @@ function initPreviewMap() {
       const c = previewMap.getCenter();
       setFieldValue('lat', c.lat.toFixed(5));
       setFieldValue('lon', c.lng.toFixed(5));
-      const zoom = previewMap.getZoom().toFixed(1);
+
+      // Convert live zoom → distance and update slider
+      const currentZoom = previewMap.getZoom();
+      const dist = zoomToDistance(currentZoom, c.lat);
+      const dv = document.getElementById('distanceSlider');
+      const dvd = document.getElementById('distanceSliderVal');
+      if (dv) { dv.value = dist; if (dvd) dvd.textContent = formatDistance(dist); }
+
       const pitch = previewMap.getPitch().toFixed(0);
       const bearing = previewMap.getBearing().toFixed(0);
-      const zv = document.getElementById('zoomSlider');
-      const zvd = document.getElementById('zoomSliderVal');
-      if (zv) { zv.value = zoom; if (zvd) zvd.textContent = zoom; }
       const pv = document.getElementById('pitchSlider');
       const pvd = document.getElementById('pitchSliderVal');
       if (pv) { pv.value = pitch; if (pvd) pvd.textContent = pitch; }
