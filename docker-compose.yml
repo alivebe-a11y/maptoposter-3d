@@ -10,10 +10,17 @@ services:
       - ./badges:/app/badges
       - ./u2net:/root/.u2net
       - ./custom_themes:/app/custom_themes
+      # Stadiums data — choose ONE of the two options below:
+      # Option A: mount the specific JSON file directly
+      #   - /path/to/stadiums.json:/app/stadiums.json
+      # Option B: mount the folder and set STADIUMS_FILE env var below
+      #   - /path/to/stadiums_folder:/app/stadiums_data
       # To use custom fonts, uncomment and place .ttf files in ./fonts/
       # - ./fonts:/app/fonts
     environment:
       - MAPBOX_TOKEN=${MAPBOX_TOKEN}
+      # If using Option B above, set the path to the file inside the mounted folder:
+      # - STADIUMS_FILE=/app/stadiums_data/stadiums.json
     deploy:
       resources:
         reservations:
