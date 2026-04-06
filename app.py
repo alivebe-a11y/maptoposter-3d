@@ -29,7 +29,11 @@ MAPBOX_TOKEN = os.environ.get('MAPBOX_TOKEN', '')
 def load_stadiums():
     try:
         with open(STADIUMS_FILE) as f:
-            return json.load(f)
+            data = json.load(f)
+        # Support both list format [{name:..}, ..] and dict format {name: {..}, ..}
+        if isinstance(data, dict):
+            return [{'name': k, **v} if isinstance(v, dict) else {'name': k} for k, v in data.items()]
+        return data
     except FileNotFoundError:
         log.warning('stadiums.json not found at %s', STADIUMS_FILE)
         return []
