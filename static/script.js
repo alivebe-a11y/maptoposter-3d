@@ -23,9 +23,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   initThemeList();
   initStadiumAutocomplete();
+  initCitySearch();
   initSliders();
   initLightingButtons();
-  initSizeButtons();
+  initBadgeScaleSlider();
   initFormHandlers();
 });
 
@@ -74,6 +75,10 @@ function toggleTheme(key, el) {
     el.classList.remove('selected');
   }
   updateThemeCount();
+  // Live-update the preview map with the first selected theme
+  if (previewMap && previewMap.isStyleLoaded()) {
+    applyThemePaint(previewMap, selectedThemes[0] || null);
+  }
 }
 
 function updateThemeCount() {
@@ -190,6 +195,68 @@ function setSliderValue(id, val) {
   if (display) display.textContent = val;
 }
 
+// ---- City / Town / Village Geocoder ----
+function initCitySearch() {
+  const input = document.getElementById('citySearch');
+  const btn = document.getElementById('citySearchBtn');
+  if (!input || !btn) return;
+
+  btn.addEventListener('click', () => geocodeCity(input.value.trim()));
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); geocodeCity(input.value.trim()); }
+  });
+}
+
+async function geocodeCity(query) {
+  if (!query) return;
+  const token = window.MAPBOX_TOKEN;
+  if (!token) { showStatus('Mapbox token required for geocoding.', 'error'); return; }
+
+  const resultsEl = document.getElementById('cityResults');
+  if (resultsEl) resultsEl.innerHTML = '<span class="city-searching">Searching…</span>';
+
+  try {
+    const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json` +
+      `?access_token=${token}&limit=5&types=place,locality,neighborhood,region,country`;
+    const resp = await fetch(url);
+    if (!resp.ok) throw new Error(`Geocoding failed: ${resp.status}`);
+    const data = await resp.json();
+    showGeocodeResults(data.features || []);
+  } catch (e) {
+    if (resultsEl) resultsEl.innerHTML = `<span class="city-error">${e.message}</span>`;
+  }
+}
+
+function showGeocodeResults(features) {
+  const el = document.getElementById('cityResults');
+  if (!el) return;
+  if (!features.length) {
+    el.innerHTML = '<span class="city-error">No results found.</span>';
+    return;
+  }
+  el.innerHTML = features.map((f, i) => `
+    <div class="city-result-item" data-idx="${i}"
+         data-lat="${f.center[1]}" data-lon="${f.center[0]}"
+         data-name="${f.place_name.replace(/"/g, '&quot;')}">
+      <span class="city-result-name">${f.place_name}</span>
+    </div>
+  `).join('');
+
+  el.querySelectorAll('.city-result-item').forEach(item => {
+    item.addEventListener('click', () => {
+      const lat = parseFloat(item.dataset.lat);
+      const lon = parseFloat(item.dataset.lon);
+      setFieldValue('lat', lat.toFixed(5));
+      setFieldValue('lon', lon.toFixed(5));
+      if (previewMap) {
+        previewMap.flyTo({ center: [lon, lat], duration: 1200 });
+      }
+      el.innerHTML = `<span class="city-selected">&#10003; ${item.dataset.name}</span>`;
+      document.getElementById('citySearch').value = '';
+    });
+  });
+}
+
 // ---- Sliders ----
 function initSliders() {
   const sliders = ['zoomSlider', 'pitchSlider', 'bearingSlider'];
@@ -218,14 +285,13 @@ function initLightingButtons() {
   });
 }
 
-// ---- Size Buttons ----
-function initSizeButtons() {
-  document.querySelectorAll('.size-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      overlaySize = btn.dataset.size;
-    });
+// ---- Badge Scale Slider ----
+function initBadgeScaleSlider() {
+  const el = document.getElementById('badgeScale');
+  const disp = document.getElementById('badgeScaleVal');
+  if (!el) return;
+  el.addEventListener('input', () => {
+    if (disp) disp.textContent = el.value + '%';
   });
 }
 
@@ -240,7 +306,7 @@ function get3DConfig() {
     pitch: parseFloat(document.getElementById('pitchSlider')?.value) || 55,
     bearing: parseFloat(document.getElementById('bearingSlider')?.value) || 0,
     lightPreset,
-    overlaySize
+    badgeScale: parseInt(document.getElementById('badgeScale')?.value || 18, 10)
   };
 }
 

@@ -8,8 +8,9 @@ services:
       - ./posters:/app/posters
       - ./overlays_cache:/app/overlays_cache
       - ./badges:/app/badges
-      - ./fonts:/app/fonts
       - ./u2net:/root/.u2net
+      # To use custom fonts, uncomment and place .ttf files in ./fonts/
+      # - ./fonts:/app/fonts
     environment:
       - MAPBOX_TOKEN=${MAPBOX_TOKEN}
     deploy:

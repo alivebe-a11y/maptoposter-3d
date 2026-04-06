@@ -57,7 +57,7 @@ def hex_to_rgb(hex_color):
     return tuple(int(h[i:i+2], 16) for i in (0, 2, 4))
 
 
-def create_poster(theme_name, stadium_name='', capture_path=None, badge_path=None):
+def create_poster(theme_name, stadium_name='', capture_path=None, badge_path=None, badge_scale=18):
     theme = load_theme(theme_name)
     stadiums = load_stadiums()
 
@@ -94,7 +94,7 @@ def create_poster(theme_name, stadium_name='', capture_path=None, badge_path=Non
     if badge_path and os.path.exists(badge_path):
         try:
             badge = Image.open(badge_path).convert('RGBA')
-            badge_size = int(WIDTH_PX * 0.18)
+            badge_size = int(WIDTH_PX * (max(5, min(35, badge_scale)) / 100))
             badge = badge.resize((badge_size, badge_size), Image.Resampling.LANCZOS)
             bx = (WIDTH_PX - badge_size) // 2
             by = (MAP_HEIGHT - badge_size) // 2
@@ -189,8 +189,10 @@ def main():
     parser.add_argument('--stadium', default='')
     parser.add_argument('--capture', default='')
     parser.add_argument('--badge', default='')
+    parser.add_argument('--badge-scale', type=int, default=18)
     args = parser.parse_args()
-    create_poster(args.theme, args.stadium, args.capture or None, args.badge or None)
+    create_poster(args.theme, args.stadium, args.capture or None, args.badge or None,
+                  badge_scale=args.badge_scale)
 
 
 if __name__ == '__main__':

@@ -115,6 +115,8 @@ def generate():
 
     badge = data.get('badge', '')
     badge_path = os.path.join(BADGES_DIR, badge) if badge else ''
+    badge_scale = int(overlay_config.get('badgeScale', 18))
+    badge_scale = max(5, min(35, badge_scale))  # clamp to valid range
 
     all_new_files = []
     try:
@@ -122,7 +124,8 @@ def generate():
             existing = set(glob.glob(os.path.join(POSTER_DIR, '*.png')))
             cmd = ['python', 'create_poster.py',
                    '--theme', theme,
-                   '--stadium', stadium_name]
+                   '--stadium', stadium_name,
+                   '--badge-scale', str(badge_scale)]
             if capture_path:
                 cmd.extend(['--capture', capture_path])
             if badge_path and os.path.exists(badge_path):

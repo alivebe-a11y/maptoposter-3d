@@ -50,6 +50,20 @@
           </datalist>
         </div>
 
+        <div class="form-row">
+          <label for="citySearch">City / Town / Village</label>
+          <div class="city-search-wrap">
+            <input type="text" id="citySearch" placeholder="e.g. Manchester, Berlin, São Paulo…"
+                   autocomplete="off" />
+            <button type="button" class="btn-city-search" id="citySearchBtn" title="Search">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+              </svg>
+            </button>
+          </div>
+          <div id="cityResults" class="city-results"></div>
+        </div>
+
         <div class="coord-display form-row">
           <div class="coord-field">
             <label for="lat">Latitude</label>
@@ -134,11 +148,13 @@
         <div class="section-title">Overlay Options</div>
 
         <div class="form-row">
-          <label>Overlay Size</label>
-          <div class="size-btns">
-            <button type="button" class="size-btn" data-size="small">Small</button>
-            <button type="button" class="size-btn active" data-size="medium">Medium</button>
-            <button type="button" class="size-btn" data-size="large">Large</button>
+          <label>Overlay / Badge Scale</label>
+          <div class="slider-row" style="margin-top:6px">
+            <div class="slider-label-row">
+              <span style="font-size:11px;color:var(--text-muted)">Badge size as % of poster width</span>
+              <span class="slider-value" id="badgeScaleVal">18%</span>
+            </div>
+            <input type="range" id="badgeScale" min="5" max="35" step="1" value="18" />
           </div>
         </div>
 
