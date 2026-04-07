@@ -8,6 +8,7 @@ let captureMap = null;
 let selectedThemes = [];
 let lightPreset = 'dusk';
 let syncingFromMap = false; // guard: prevents map→slider→syncPreviewMap loop
+let currentPreviewStyleUrl = null; // tracks active style to avoid redundant setStyle calls
 
 // ---- Distance ↔ Zoom Conversion ----
 // Formula based on 4096px capture canvas, Mapbox 512px tile size:
@@ -377,6 +378,12 @@ function get3DConfig() {
 // ---- Basemap Config ----
 const STANDARD_STYLE = 'mapbox://styles/mapbox/standard';
 
+function getThemeStyleUrl(themeName) {
+  if (!themeName) return STANDARD_STYLE;
+  const td = window.THEMES && window.THEMES[themeName];
+  return (td && td.style_url) ? td.style_url : STANDARD_STYLE;
+}
+
 function applyBasemapConfig(map, lp) {
   try { map.setConfigProperty('basemap', 'lightPreset', lp || 'dusk'); } catch (e) {}
   try { map.setConfigProperty('basemap', 'showPointOfInterestLabels', false); } catch (e) {}
@@ -412,16 +419,36 @@ function updateThemeOverlay(themeName) {
 }
 
 // ---- Apply Theme Paint ----
-// NOTE: Mapbox Standard style (v3) does NOT expose colour config properties
-// (colorBackground, colorWater, colorRoads, etc.) — those calls silently fail.
-// The only valid config properties are: lightPreset, showPointOfInterestLabels,
-// showPlaceLabels, showRoadLabels, showTransitLabels.
-// Theme colours are applied in the PIL compositor (create_poster.py) via a
-// per-theme colour tint over the captured map image.
-// This function is intentionally kept for custom-style compatibility if the
-// Standard style ever exposes these, but currently only updates the overlay.
+// For themes with a style_url: switches the map to their Mapbox style so the
+// map itself renders in that theme's colours (roads, water, buildings etc.).
+// For themes without a style_url: stays on Standard + shows a 25%-opacity
+// colour tint overlay (PIL compositor mirrors this for the printed poster).
 function applyThemePaint(map, themeName) {
-  updateThemeOverlay(themeName);
+  const styleUrl = getThemeStyleUrl(themeName);
+  const isPreview = (map === previewMap);
+
+  if (isPreview && styleUrl !== currentPreviewStyleUrl) {
+    currentPreviewStyleUrl = styleUrl;
+    map.setStyle(styleUrl);
+    map.once('style.load', () => {
+      if (styleUrl === STANDARD_STYLE) {
+        applyBasemapConfig(map, lightPreset);
+        updateThemeOverlay(themeName);
+      } else {
+        // Custom style loaded — hide Standard overlay
+        const overlay = document.getElementById('mapThemeOverlay');
+        if (overlay) overlay.style.display = 'none';
+      }
+    });
+    return;
+  }
+
+  if (styleUrl === STANDARD_STYLE) {
+    updateThemeOverlay(themeName);
+  } else {
+    const overlay = document.getElementById('mapThemeOverlay');
+    if (overlay) overlay.style.display = 'none';
+  }
 }
 
 // ---- Preview Map ----
@@ -458,23 +485,26 @@ function initPreviewMap() {
   container.style.display = 'block';
   updateThemeOverlay(selectedThemes[0] || null);
 
+  const activeTheme = selectedThemes[0] || null;
+  const initialStyle = getThemeStyleUrl(activeTheme);
+
   if (previewMap) {
     previewMap.setCenter([cfg.lon, cfg.lat]);
     previewMap.setZoom(cfg.zoom);
     previewMap.setPitch(cfg.pitch);
     previewMap.setBearing(cfg.bearing);
-    try { previewMap.setConfigProperty('basemap', 'lightPreset', cfg.lightPreset); } catch (e) {}
-
-    const activeTheme = selectedThemes[0] || null;
-    if (activeTheme && previewMap.isStyleLoaded()) {
+    if (previewMap.isStyleLoaded()) {
       applyThemePaint(previewMap, activeTheme);
+    } else {
+      try { previewMap.setConfigProperty('basemap', 'lightPreset', cfg.lightPreset); } catch (e) {}
     }
     return;
   }
 
+  currentPreviewStyleUrl = initialStyle;
   previewMap = new mapboxgl.Map({
     container: 'mapPreview',
-    style: STANDARD_STYLE,
+    style: initialStyle,
     center: [cfg.lon, cfg.lat],
     zoom: cfg.zoom,
     pitch: cfg.pitch,
@@ -485,9 +515,11 @@ function initPreviewMap() {
   });
 
   previewMap.on('style.load', () => {
-    applyBasemapConfig(previewMap, cfg.lightPreset);
-    const activeTheme = selectedThemes[0] || null;
-    if (activeTheme) applyThemePaint(previewMap, activeTheme);
+    if (currentPreviewStyleUrl === STANDARD_STYLE) {
+      applyBasemapConfig(previewMap, cfg.lightPreset);
+    }
+    const theme = selectedThemes[0] || null;
+    if (theme) applyThemePaint(previewMap, theme);
   });
 
   previewMap.on('move', () => {
@@ -533,9 +565,11 @@ function capture3DMap() {
       captureMap = null;
     }
 
+    const captureStyleUrl = getThemeStyleUrl(activeTheme);
+
     captureMap = new mapboxgl.Map({
       container: 'captureMap',
-      style: STANDARD_STYLE,
+      style: captureStyleUrl,
       center: [cfg.lon, cfg.lat],
       zoom: cfg.zoom,
       pitch: cfg.pitch,
@@ -549,9 +583,10 @@ function capture3DMap() {
     let captured = false;
 
     captureMap.on('style.load', () => {
-      applyBasemapConfig(captureMap, cfg.lightPreset);
-      try { captureMap.setConfigProperty('basemap', 'colorBackground', '#050505'); } catch (e) {}
-      if (activeTheme) applyThemePaint(captureMap, activeTheme);
+      if (captureStyleUrl === STANDARD_STYLE) {
+        applyBasemapConfig(captureMap, cfg.lightPreset);
+        try { captureMap.setConfigProperty('basemap', 'colorBackground', '#050505'); } catch (e) {}
+      }
     });
 
     captureMap.on('idle', () => {
