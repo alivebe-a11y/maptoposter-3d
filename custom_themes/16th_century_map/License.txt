@@ -1,3 +1,0 @@
-Based on Mapbox style by Ezequiel Mastrasso.
-https://github.com/ezequielmastrasso/mapbox-16th-century-map
-MIT License

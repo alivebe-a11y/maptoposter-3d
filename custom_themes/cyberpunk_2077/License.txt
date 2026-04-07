@@ -1,3 +1,0 @@
-Based on Cyberpunk 2077 style by Musthaq Ahamad (haxzie).
-https://github.com/haxzie/stylebox
-MIT License

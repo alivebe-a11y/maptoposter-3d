@@ -1,2 +1,0 @@
-Mapbox style by bmick (private style, reproduced with permission).
-Colors extracted from exported style JSON.
