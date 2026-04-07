@@ -381,7 +381,12 @@ const STANDARD_STYLE = 'mapbox://styles/mapbox/standard';
 function getThemeStyleUrl(themeName) {
   if (!themeName) return STANDARD_STYLE;
   const td = window.THEMES && window.THEMES[themeName];
-  return (td && td.style_url) ? td.style_url : STANDARD_STYLE;
+  if (!td || !td.style_url) return STANDARD_STYLE;
+  // Relative URLs (custom themes served from Flask) need to be made absolute
+  // so Mapbox GL JS can fetch them correctly.
+  const url = td.style_url;
+  if (url.startsWith('/')) return window.location.origin + url;
+  return url;
 }
 
 function applyBasemapConfig(map, lp) {

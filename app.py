@@ -45,14 +45,41 @@ def load_stadiums():
         return []
 
 
+def is_mapbox_style(data):
+    """True if data is a full Mapbox GL style spec (has version + layers)."""
+    return isinstance(data, dict) and 'version' in data and 'layers' in data
+
+
+def derive_theme_colors(style):
+    """Extract bg/text/water colors from a full Mapbox GL style for the poster compositor."""
+    bg = '#111111'
+    text = '#FFFFFF'
+    water = '#1A3A5C'
+    for layer in style.get('layers', []):
+        lid = layer.get('id', '')
+        ltype = layer.get('type', '')
+        paint = layer.get('paint', {})
+        if ltype == 'background':
+            c = paint.get('background-color')
+            if isinstance(c, str) and c.startswith('#'):
+                bg = c
+        if 'water' in lid and ltype == 'fill':
+            c = paint.get('fill-color')
+            if isinstance(c, str) and c.startswith('#'):
+                water = c
+        if ('country-label' in lid or 'place-city' in lid) and ltype == 'symbol':
+            c = paint.get('text-color')
+            if isinstance(c, str) and c.startswith('#'):
+                text = c
+    return {'bg': bg, 'text': text, 'water': water}
+
+
 def load_themes():
     themes = []
-    # Built-in flat themes: themes/{name}.json
     if os.path.exists(THEME_DIR):
         for f in sorted(os.listdir(THEME_DIR)):
             if f.endswith('.json'):
                 themes.append(f.replace('.json', ''))
-    # Custom themes: custom_themes/{name}/style.json
     if os.path.exists(CUSTOM_THEME_DIR):
         for d in sorted(os.listdir(CUSTOM_THEME_DIR)):
             style_path = os.path.join(CUSTOM_THEME_DIR, d, 'style.json')
@@ -62,7 +89,11 @@ def load_themes():
 
 
 def load_theme_data(theme_name):
-    """Return parsed theme JSON for a given theme name, checking both locations."""
+    """Return theme data for poster compositor.
+    Built-in themes: returned as-is.
+    Custom themes with simplified format: returned as-is.
+    Custom themes with full Mapbox style JSON: colors extracted + style_url set to /api/styles/<name>.
+    """
     flat = os.path.join(THEME_DIR, f'{theme_name}.json')
     if os.path.exists(flat):
         with open(flat) as f:
@@ -70,7 +101,16 @@ def load_theme_data(theme_name):
     custom = os.path.join(CUSTOM_THEME_DIR, theme_name, 'style.json')
     if os.path.exists(custom):
         with open(custom) as f:
-            return json.load(f)
+            data = json.load(f)
+        if is_mapbox_style(data):
+            colors = derive_theme_colors(data)
+            return {
+                'name': data.get('name', theme_name),
+                'description': f"Custom Mapbox style: {data.get('name', theme_name)}",
+                'style_url': f'/api/styles/{theme_name}',
+                **colors
+            }
+        return data
     raise FileNotFoundError(f'Theme not found: {theme_name}')
 
 
@@ -171,6 +211,20 @@ def generate():
     else:
         return jsonify({'success': True, 'batch': True,
                         'count': len(all_new_files), 'themes': themes})
+
+
+@app.route('/api/styles/<theme_name>')
+def serve_custom_style(theme_name):
+    """Serve raw Mapbox GL style JSON for a custom theme dropped into custom_themes/."""
+    # Basic sanitise — only allow alphanumeric + underscores/hyphens
+    if not all(c.isalnum() or c in ('_', '-') for c in theme_name):
+        return jsonify({'error': 'Invalid theme name'}), 400
+    style_path = os.path.join(CUSTOM_THEME_DIR, theme_name, 'style.json')
+    if not os.path.exists(style_path):
+        return jsonify({'error': 'Style not found'}), 404
+    with open(style_path) as f:
+        style = json.load(f)
+    return jsonify(style)
 
 
 @app.route('/posters/<path:filename>')

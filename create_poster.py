@@ -26,17 +26,43 @@ MAP_HEIGHT = int(HEIGHT_PX * 0.80)
 TEXT_AREA_TOP = MAP_HEIGHT
 
 
+def is_mapbox_style(data):
+    return isinstance(data, dict) and 'version' in data and 'layers' in data
+
+
+def derive_theme_colors(style):
+    """Extract bg/text/water from a full Mapbox GL style for the poster compositor."""
+    bg, text, water = '#111111', '#FFFFFF', '#1A3A5C'
+    for layer in style.get('layers', []):
+        lid = layer.get('id', '')
+        paint = layer.get('paint', {})
+        if layer.get('type') == 'background':
+            c = paint.get('background-color')
+            if isinstance(c, str) and c.startswith('#'):
+                bg = c
+        if 'water' in lid and layer.get('type') == 'fill':
+            c = paint.get('fill-color')
+            if isinstance(c, str) and c.startswith('#'):
+                water = c
+        if ('country-label' in lid or 'place-city' in lid) and layer.get('type') == 'symbol':
+            c = paint.get('text-color')
+            if isinstance(c, str) and c.startswith('#'):
+                text = c
+    return {'bg': bg, 'text': text, 'water': water, 'style_url': '__local__'}
+
+
 def load_theme(theme_name):
-    # Check built-in flat themes first
     flat = os.path.join(THEMES_DIR, f'{theme_name}.json')
     if os.path.exists(flat):
         with open(flat) as f:
             return json.load(f)
-    # Fall back to custom themes directory
     custom = os.path.join(CUSTOM_THEMES_DIR, theme_name, 'style.json')
     if os.path.exists(custom):
         with open(custom) as f:
-            return json.load(f)
+            data = json.load(f)
+        if is_mapbox_style(data):
+            return derive_theme_colors(data)
+        return data
     raise FileNotFoundError(f'Theme not found: {theme_name}')
 
 
