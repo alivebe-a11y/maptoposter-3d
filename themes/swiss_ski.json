@@ -1,0 +1,19 @@
+{
+  "name": "Swiss Ski",
+  "style_url": "https://raw.githubusercontent.com/mapbox/mapbox-gl-swiss-ski-style/master/cij1zoclj002y8rkkdjl69psd.json",
+  "style_json_url": "https://raw.githubusercontent.com/mapbox/mapbox-gl-swiss-ski-style/master/cij1zoclj002y8rkkdjl69psd.json",
+  "description": "Specialised alpine cartography from Mapbox designed for ski mapping in Switzerland. Crisp white, vivid blue water, custom ski run and lift symbology.",
+  "author": "Mapbox",
+  "source": "https://github.com/mapbox/mapbox-gl-swiss-ski-style",
+  "license": "Mapbox Terms",
+  "bg": "#ffffff",
+  "text": "#303030",
+  "water": "#62b0f0",
+  "parks": "#d4ecd4",
+  "road_motorway": "#ffffff",
+  "road_primary": "#ffffff",
+  "road_secondary": "#ffffff",
+  "road_tertiary": "#eeeeee",
+  "road_residential": "#eeeeee",
+  "road_default": "#eeeeee"
+}

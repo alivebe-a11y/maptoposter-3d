@@ -1,0 +1,18 @@
+{
+  "name": "Satellite",
+  "style_url": "mapbox://styles/mapbox/satellite-v9",
+  "description": "Global satellite and aerial imagery. Rich photographic detail \u2014 stadiums, pitches and surrounding terrain captured from above.",
+  "author": "Mapbox",
+  "source": "https://github.com/mapbox/mapbox-gl-styles",
+  "license": "Mapbox Terms",
+  "bg": "#0a0a0a",
+  "text": "#ffffff",
+  "water": "#1a3a5c",
+  "parks": "#1a3a1a",
+  "road_motorway": "#888888",
+  "road_primary": "#666666",
+  "road_secondary": "#555555",
+  "road_tertiary": "#444444",
+  "road_residential": "#333333",
+  "road_default": "#444444"
+}

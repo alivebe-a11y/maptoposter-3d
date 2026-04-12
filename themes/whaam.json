@@ -1,0 +1,19 @@
+{
+  "name": "Whaam!",
+  "style_url": "https://raw.githubusercontent.com/mapbox/mapbox-gl-whaam-style/master/cii8323c8004w0nlvtss3dbm2.json",
+  "style_json_url": "https://raw.githubusercontent.com/mapbox/mapbox-gl-whaam-style/master/cii8323c8004w0nlvtss3dbm2.json",
+  "description": "Roy Lichtenstein-inspired pop-art map style from Mapbox. Comic-book halftone patterns, bold red text, blazing yellow motorways on stark white.",
+  "author": "Mapbox",
+  "source": "https://github.com/mapbox/mapbox-gl-whaam-style",
+  "license": "Mapbox Terms",
+  "bg": "#fcfafa",
+  "text": "#e30e0e",
+  "water": "#cce8f8",
+  "parks": "#186e18",
+  "road_motorway": "#f5f514",
+  "road_primary": "#ffffff",
+  "road_secondary": "#ffffff",
+  "road_tertiary": "#ffffff",
+  "road_residential": "#ffffff",
+  "road_default": "#ffffff"
+}

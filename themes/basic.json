@@ -1,0 +1,19 @@
+{
+  "name": "Basic",
+  "style_url": "mapbox://styles/mapbox/basic-v8",
+  "style_json_url": "https://raw.githubusercontent.com/mapbox/mapbox-gl-styles/master/styles/basic-v8.json",
+  "description": "Simple and flexible Mapbox starter template \u2014 neutral greys, soft blue water, muted green parks. Clean foundation for data overlays.",
+  "author": "Mapbox",
+  "source": "https://github.com/mapbox/mapbox-gl-styles",
+  "license": "BSD-2-Clause",
+  "bg": "#dedede",
+  "text": "#666666",
+  "water": "#a0cfdf",
+  "parks": "#d2edae",
+  "road_motorway": "#ffffff",
+  "road_primary": "#ffffff",
+  "road_secondary": "#ffffff",
+  "road_tertiary": "#efefef",
+  "road_residential": "#efefef",
+  "road_default": "#efefef"
+}

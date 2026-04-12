@@ -1,0 +1,19 @@
+{
+  "name": "Camouflage",
+  "style_url": "https://raw.githubusercontent.com/jingsam/mapbox-gl-styles/master/Camouflage.json",
+  "style_json_url": "https://raw.githubusercontent.com/jingsam/mapbox-gl-styles/master/Camouflage.json",
+  "description": "Military-aesthetic dark map by jingsam. Near-black background with deep olive-green parks, charcoal road network and black water bodies \u2014 tactical and subdued.",
+  "author": "jingsam",
+  "source": "https://github.com/jingsam/mapbox-gl-styles",
+  "license": "See repository",
+  "bg": "#191c1a",
+  "text": "#8a9a80",
+  "water": "#000000",
+  "parks": "#2e422a",
+  "road_motorway": "#595143",
+  "road_primary": "#444444",
+  "road_secondary": "#444444",
+  "road_tertiary": "#383838",
+  "road_residential": "#2c2c2c",
+  "road_default": "#444444"
+}

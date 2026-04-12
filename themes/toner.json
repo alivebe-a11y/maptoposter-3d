@@ -1,0 +1,20 @@
+{
+  "name": "Toner",
+  "style_url": "https://raw.githubusercontent.com/openmaptiles/toner-gl-style/master/style.json",
+  "style_json_url": "https://raw.githubusercontent.com/openmaptiles/toner-gl-style/master/style.json",
+  "description": "Stark black-and-white style by OpenMapTiles, based on Stamen's classic Toner. Pure white background, solid black roads and water \u2014 maximum contrast, graphic design aesthetic.",
+  "author": "OpenMapTiles (based on Stamen Toner)",
+  "source": "https://github.com/openmaptiles/toner-gl-style",
+  "license": "BSD-2-Clause",
+  "openmaptiles": true,
+  "bg": "#ffffff",
+  "text": "#000000",
+  "water": "#000000",
+  "parks": "#dddddd",
+  "road_motorway": "#000000",
+  "road_primary": "#000000",
+  "road_secondary": "#000000",
+  "road_tertiary": "#000000",
+  "road_residential": "#000000",
+  "road_default": "#000000"
+}
