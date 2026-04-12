@@ -141,6 +141,56 @@
         </div>
       </div>
 
+      <!-- ---- Map Layers ---- -->
+      <div class="section-card">
+        <div class="section-title">Map Layers</div>
+
+        <div class="toggle-row">
+          <span class="toggle-label">3D Buildings</span>
+          <label class="toggle-switch">
+            <input type="checkbox" id="toggle3dBuildings" checked />
+            <span class="toggle-knob"></span>
+          </label>
+        </div>
+
+        <div class="toggle-row">
+          <span class="toggle-label">3D Terrain</span>
+          <label class="toggle-switch">
+            <input type="checkbox" id="toggle3dTerrain" />
+            <span class="toggle-knob"></span>
+          </label>
+        </div>
+        <div id="terrainExaggerationRow" class="sub-option" style="display:none">
+          <div class="slider-label-row">
+            <span style="font-size:12px;font-weight:500;color:var(--text-muted)">Exaggeration</span>
+            <span class="slider-value" id="terrainExaggerationVal">1.5×</span>
+          </div>
+          <input type="range" id="terrainExaggerationSlider" min="0.5" max="5" step="0.1" value="1.5" style="margin-top:6px" />
+        </div>
+
+        <div class="toggle-row">
+          <span class="toggle-label">Contours</span>
+          <label class="toggle-switch">
+            <input type="checkbox" id="toggleContours" />
+            <span class="toggle-knob"></span>
+          </label>
+        </div>
+        <div id="contourOptions" class="sub-option" style="display:none">
+          <div class="unit-toggle">
+            <button type="button" class="unit-btn active" data-unit="meters">m</button>
+            <button type="button" class="unit-btn" data-unit="feet">ft</button>
+          </div>
+        </div>
+
+        <div class="slider-row" style="margin-top:10px;margin-bottom:0">
+          <div class="slider-label-row">
+            <span style="font-size:12px;font-weight:500;color:var(--text-muted)">Road Width</span>
+            <span class="slider-value" id="roadWidthVal">1×</span>
+          </div>
+          <input type="range" id="roadWidthSlider" min="0.25" max="3" step="0.05" value="1" />
+        </div>
+      </div>
+
       <!-- ---- Themes ---- -->
       <div class="section-card">
         <div class="theme-select-header">

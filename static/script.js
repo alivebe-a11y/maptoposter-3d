@@ -10,6 +10,15 @@ let lightPreset = 'dusk';
 let syncingFromMap = false; // guard: prevents map→slider→syncPreviewMap loop
 let currentPreviewStyleUrl = null; // tracks active style to avoid redundant setStyle calls
 
+// ---- Map Layers State ----
+let show3dBuildings = true;
+let show3dTerrain = false;
+let terrainExaggeration = 1.5;
+let showContours = false;
+let contourUnit = 'meters';
+let roadWidthMultiplier = 1.0;
+let roadLayerOriginalWidths = {}; // { layerId: original line-width value }
+
 // ---- Distance ↔ Zoom Conversion ----
 // Formula based on 4096px capture canvas, Mapbox 512px tile size:
 //   visible_half_width = (captureSize/2) * (earthCirc * cos(lat)) / (tileSize * 2^zoom)
@@ -52,6 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initSliders();
   initLightingButtons();
   initBadgeScaleSlider();
+  initMapLayersControls();
   initFormHandlers();
 });
 
@@ -434,6 +444,7 @@ function applyThemePaint(map, themeName) {
 
   if (isPreview && styleUrl !== currentPreviewStyleUrl) {
     currentPreviewStyleUrl = styleUrl;
+    roadLayerOriginalWidths = {}; // invalidate cache for new style
     map.setStyle(styleUrl);
     map.once('style.load', () => {
       if (styleUrl === STANDARD_STYLE) {
@@ -453,6 +464,239 @@ function applyThemePaint(map, themeName) {
   } else {
     const overlay = document.getElementById('mapThemeOverlay');
     if (overlay) overlay.style.display = 'none';
+  }
+}
+
+// ---- Map Layer Controls ----
+
+function apply3dBuildings(map, enabled) {
+  if (!map) return;
+  // Mapbox Standard v3 config
+  try { map.setConfigProperty('basemap', 'show3dObjects', enabled); } catch (e) {}
+  // Custom styles: toggle fill-extrusion layers by visibility
+  try {
+    const style = map.getStyle();
+    if (style && style.layers) {
+      style.layers.forEach(layer => {
+        if (layer.type === 'fill-extrusion') {
+          const id = layer.id.toLowerCase();
+          if (id.includes('building') || id.includes('3d') || id.includes('extrusion')) {
+            map.setLayoutProperty(layer.id, 'visibility', enabled ? 'visible' : 'none');
+          }
+        }
+      });
+    }
+  } catch (e) {}
+}
+
+function apply3dTerrain(map, enabled, exaggeration) {
+  if (!map) return;
+  if (enabled) {
+    if (!map.getSource('mapbox-dem')) {
+      try {
+        map.addSource('mapbox-dem', {
+          type: 'raster-dem',
+          url: 'mapbox://mapbox.mapbox-terrain-dem-v1',
+          tileSize: 512,
+          maxzoom: 14
+        });
+      } catch (e) {}
+    }
+    try { map.setTerrain({ source: 'mapbox-dem', exaggeration }); } catch (e) {}
+  } else {
+    try { map.setTerrain(null); } catch (e) {}
+    // Leave the source; it's harmless and avoids re-add cost on next enable
+  }
+}
+
+const CONTOUR_SOURCE = 'mtp-terrain-contours';
+const CONTOUR_LAYERS = ['mtp-contour-minor', 'mtp-contour-major', 'mtp-contour-label'];
+
+function removeContourLayers(map) {
+  CONTOUR_LAYERS.forEach(id => {
+    try { if (map.getLayer(id)) map.removeLayer(id); } catch (e) {}
+  });
+  try { if (map.getSource(CONTOUR_SOURCE)) map.removeSource(CONTOUR_SOURCE); } catch (e) {}
+}
+
+function applyContours(map, enabled, unit) {
+  if (!map) return;
+  removeContourLayers(map);
+  if (!enabled) return;
+
+  try {
+    map.addSource(CONTOUR_SOURCE, {
+      type: 'vector',
+      url: 'mapbox://mapbox.mapbox-terrain-v2'
+    });
+
+    // Minor contours (index = 0)
+    map.addLayer({
+      id: 'mtp-contour-minor',
+      type: 'line',
+      source: CONTOUR_SOURCE,
+      'source-layer': 'contour',
+      filter: ['==', ['get', 'index'], 0],
+      paint: {
+        'line-color': 'rgba(120, 80, 30, 0.3)',
+        'line-width': 0.5
+      }
+    });
+
+    // Major contours (index = 1)
+    map.addLayer({
+      id: 'mtp-contour-major',
+      type: 'line',
+      source: CONTOUR_SOURCE,
+      'source-layer': 'contour',
+      filter: ['==', ['get', 'index'], 1],
+      paint: {
+        'line-color': 'rgba(120, 80, 30, 0.65)',
+        'line-width': 1.2
+      }
+    });
+
+    // Labels on major contours
+    const labelExpr = unit === 'feet'
+      ? ['concat', ['to-string', ['round', ['*', ['get', 'ele'], 3.28084]]], ' ft']
+      : ['concat', ['to-string', ['get', 'ele']], ' m'];
+
+    map.addLayer({
+      id: 'mtp-contour-label',
+      type: 'symbol',
+      source: CONTOUR_SOURCE,
+      'source-layer': 'contour',
+      filter: ['==', ['get', 'index'], 1],
+      layout: {
+        'text-field': labelExpr,
+        'text-size': 10,
+        'symbol-placement': 'line',
+        'text-pitch-alignment': 'viewport',
+        'text-max-angle': 25
+      },
+      paint: {
+        'text-color': 'rgba(90, 50, 10, 0.85)',
+        'text-halo-color': 'rgba(255,255,255,0.65)',
+        'text-halo-width': 1
+      }
+    });
+  } catch (e) {
+    console.warn('Contour layer error:', e);
+  }
+}
+
+const ROAD_PATTERNS = ['road', 'street', 'motorway', 'highway', 'trunk',
+                       'bridge', 'tunnel', 'path', 'track', 'service', 'ferry'];
+
+function cacheRoadWidths(map) {
+  roadLayerOriginalWidths = {};
+  try {
+    const style = map.getStyle();
+    if (!style || !style.layers) return;
+    style.layers.forEach(layer => {
+      if (layer.type !== 'line') return;
+      const id = layer.id.toLowerCase();
+      if (!ROAD_PATTERNS.some(p => id.includes(p))) return;
+      const w = map.getPaintProperty(layer.id, 'line-width');
+      if (w !== undefined && w !== null) roadLayerOriginalWidths[layer.id] = w;
+    });
+  } catch (e) {}
+}
+
+function applyRoadWidth(map, multiplier) {
+  if (!map) return;
+  if (Object.keys(roadLayerOriginalWidths).length === 0) cacheRoadWidths(map);
+  Object.entries(roadLayerOriginalWidths).forEach(([layerId, orig]) => {
+    try {
+      let newWidth;
+      if (typeof orig === 'number') {
+        newWidth = orig * multiplier;
+      } else if (Array.isArray(orig)) {
+        newWidth = ['*', multiplier, orig];
+      } else {
+        return;
+      }
+      map.setPaintProperty(layerId, 'line-width', newWidth);
+    } catch (e) {}
+  });
+}
+
+// Apply all current layer settings to a map instance
+function applyMapLayers(map) {
+  apply3dBuildings(map, show3dBuildings);
+  apply3dTerrain(map, show3dTerrain, terrainExaggeration);
+  applyContours(map, showContours, contourUnit);
+  applyRoadWidth(map, roadWidthMultiplier);
+}
+
+// ---- Init Map Layer Controls ----
+function initMapLayersControls() {
+  // 3D Buildings
+  const tog3dBuildings = document.getElementById('toggle3dBuildings');
+  if (tog3dBuildings) {
+    tog3dBuildings.addEventListener('change', () => {
+      show3dBuildings = tog3dBuildings.checked;
+      if (previewMap && previewMap.isStyleLoaded()) apply3dBuildings(previewMap, show3dBuildings);
+    });
+  }
+
+  // 3D Terrain
+  const tog3dTerrain = document.getElementById('toggle3dTerrain');
+  const terrainRow = document.getElementById('terrainExaggerationRow');
+  if (tog3dTerrain) {
+    tog3dTerrain.addEventListener('change', () => {
+      show3dTerrain = tog3dTerrain.checked;
+      if (terrainRow) terrainRow.style.display = show3dTerrain ? 'block' : 'none';
+      if (previewMap && previewMap.isStyleLoaded()) apply3dTerrain(previewMap, show3dTerrain, terrainExaggeration);
+    });
+  }
+
+  const terrainSlider = document.getElementById('terrainExaggerationSlider');
+  const terrainVal = document.getElementById('terrainExaggerationVal');
+  if (terrainSlider) {
+    terrainSlider.addEventListener('input', () => {
+      terrainExaggeration = parseFloat(terrainSlider.value);
+      if (terrainVal) terrainVal.textContent = terrainExaggeration.toFixed(1) + '×';
+      if (show3dTerrain && previewMap && previewMap.isStyleLoaded()) {
+        apply3dTerrain(previewMap, true, terrainExaggeration);
+      }
+    });
+  }
+
+  // Contours
+  const togContours = document.getElementById('toggleContours');
+  const contourOptions = document.getElementById('contourOptions');
+  if (togContours) {
+    togContours.addEventListener('change', () => {
+      showContours = togContours.checked;
+      if (contourOptions) contourOptions.style.display = showContours ? 'block' : 'none';
+      if (previewMap && previewMap.isStyleLoaded()) applyContours(previewMap, showContours, contourUnit);
+    });
+  }
+
+  document.querySelectorAll('.unit-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.unit-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      contourUnit = btn.dataset.unit;
+      if (showContours && previewMap && previewMap.isStyleLoaded()) {
+        applyContours(previewMap, true, contourUnit);
+      }
+    });
+  });
+
+  // Road Width
+  const roadWidthSlider = document.getElementById('roadWidthSlider');
+  const roadWidthVal = document.getElementById('roadWidthVal');
+  if (roadWidthSlider) {
+    roadWidthSlider.addEventListener('input', () => {
+      roadWidthMultiplier = parseFloat(roadWidthSlider.value);
+      const display = roadWidthMultiplier % 1 === 0
+        ? roadWidthMultiplier + '×'
+        : roadWidthMultiplier.toFixed(2).replace(/0+$/, '') + '×';
+      if (roadWidthVal) roadWidthVal.textContent = display;
+      if (previewMap && previewMap.isStyleLoaded()) applyRoadWidth(previewMap, roadWidthMultiplier);
+    });
   }
 }
 
@@ -525,6 +769,8 @@ function initPreviewMap() {
     }
     const theme = selectedThemes[0] || null;
     if (theme) applyThemePaint(previewMap, theme);
+    roadLayerOriginalWidths = {}; // re-cache for freshly loaded style
+    applyMapLayers(previewMap);
   });
 
   previewMap.on('move', () => {
@@ -591,6 +837,17 @@ function capture3DMap() {
       if (captureStyleUrl === STANDARD_STYLE) {
         applyBasemapConfig(captureMap, cfg.lightPreset);
         try { captureMap.setConfigProperty('basemap', 'colorBackground', '#050505'); } catch (e) {}
+      }
+      // Apply all layer settings to the offscreen capture map
+      const captureRoadCache = roadLayerOriginalWidths; // borrow preview cache (same style)
+      apply3dBuildings(captureMap, show3dBuildings);
+      apply3dTerrain(captureMap, show3dTerrain, terrainExaggeration);
+      applyContours(captureMap, showContours, contourUnit);
+      // Road width: use preview cache if available, otherwise cache from capture map
+      if (roadWidthMultiplier !== 1.0) {
+        if (Object.keys(captureRoadCache).length === 0) cacheRoadWidths(captureMap);
+        applyRoadWidth(captureMap, roadWidthMultiplier);
+        roadLayerOriginalWidths = captureRoadCache; // restore
       }
     });
 

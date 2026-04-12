@@ -164,7 +164,8 @@ def generate():
             pitch = int(overlay_config.get('pitch', 0))
             bearing = int(overlay_config.get('bearing', 0))
             light = overlay_config.get('lightPreset', 'dusk')
-            cache_name = f"capture_{lat}_{lon}_z{zoom}_p{pitch}_b{bearing}_{light}.png"
+            first_theme = themes[0] if themes else 'default'
+            cache_name = f"capture_{lat}_{lon}_z{zoom}_p{pitch}_b{bearing}_{light}_{first_theme}.png"
             capture_path = os.path.join(OVERLAY_CACHE_DIR, cache_name)
             if not os.path.exists(capture_path):
                 img_data = mapbox_capture
