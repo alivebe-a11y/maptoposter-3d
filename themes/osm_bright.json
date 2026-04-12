@@ -1,0 +1,20 @@
+{
+  "name": "OSM Bright",
+  "style_url": "https://raw.githubusercontent.com/openmaptiles/osm-bright-gl-style/master/style.json",
+  "style_json_url": "https://raw.githubusercontent.com/openmaptiles/osm-bright-gl-style/master/style.json",
+  "description": "OpenMapTiles adaptation of the classic Mapbox Bright style. Warm cream background, amber motorways, soft greens and blues \u2014 familiar and inviting.",
+  "author": "OpenMapTiles",
+  "source": "https://github.com/openmaptiles/osm-bright-gl-style",
+  "license": "BSD-2-Clause",
+  "openmaptiles": true,
+  "bg": "#f8f4f0",
+  "text": "#333333",
+  "water": "#d2e6f0",
+  "parks": "#d8e8c8",
+  "road_motorway": "#ffcc88",
+  "road_primary": "#ffeeaa",
+  "road_secondary": "#ffeeaa",
+  "road_tertiary": "#ffeeaa",
+  "road_residential": "#ffffff",
+  "road_default": "#ffffff"
+}

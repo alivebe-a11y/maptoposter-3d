@@ -1,0 +1,20 @@
+{
+  "name": "Dark Matter",
+  "style_url": "https://raw.githubusercontent.com/openmaptiles/dark-matter-gl-style/master/style.json",
+  "style_json_url": "https://raw.githubusercontent.com/openmaptiles/dark-matter-gl-style/master/style.json",
+  "description": "Deep charcoal dark basemap by OpenMapTiles. Near-black background with subtle dark grey road hierarchy \u2014 optimal for data visualisation overlays.",
+  "author": "OpenMapTiles",
+  "source": "https://github.com/openmaptiles/dark-matter-gl-style",
+  "license": "BSD-2-Clause",
+  "openmaptiles": true,
+  "bg": "#0c0c0c",
+  "text": "#656565",
+  "water": "#1b1b1d",
+  "parks": "#202020",
+  "road_motorway": "#000000",
+  "road_primary": "#121212",
+  "road_secondary": "#121212",
+  "road_tertiary": "#181818",
+  "road_residential": "#181818",
+  "road_default": "#181818"
+}

@@ -1,0 +1,19 @@
+{
+  "name": "Neon",
+  "style_url": "https://raw.githubusercontent.com/NatEvatt/awesome-mapbox-gl-styles/master/styles/Neon/style.json",
+  "style_json_url": "https://raw.githubusercontent.com/NatEvatt/awesome-mapbox-gl-styles/master/styles/Neon/style.json",
+  "description": "Dark city map inspired by neon signs. Near-black background with vibrant cyan residentials, neon green primary roads, red motorways and amber secondary streets.",
+  "author": "Stephen Smith / NatEvatt",
+  "source": "https://github.com/NatEvatt/awesome-mapbox-gl-styles/tree/master/styles/Neon",
+  "license": "See repository",
+  "bg": "#1f1a1d",
+  "text": "#00ffff",
+  "water": "#224466",
+  "parks": "#1a3020",
+  "road_motorway": "#bb1111",
+  "road_primary": "#00cc44",
+  "road_secondary": "#aa9900",
+  "road_tertiary": "#886600",
+  "road_residential": "#004488",
+  "road_default": "#00ffff"
+}

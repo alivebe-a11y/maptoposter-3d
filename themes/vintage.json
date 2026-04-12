@@ -1,0 +1,19 @@
+{
+  "name": "Vintage",
+  "style_url": "https://raw.githubusercontent.com/mapbox/mapbox-gl-vintage-style/master/cif5p01n202nisaktvljx9mv3.json",
+  "style_json_url": "https://raw.githubusercontent.com/mapbox/mapbox-gl-vintage-style/master/cif5p01n202nisaktvljx9mv3.json",
+  "description": "Beautiful retro cartographic aesthetic from Mapbox. Warm terracotta background, muted brown-grey water, earthy neutrals throughout \u2014 timeless and elegant.",
+  "author": "Mapbox",
+  "source": "https://github.com/mapbox/mapbox-gl-vintage-style",
+  "license": "Mapbox Terms",
+  "bg": "#cfb19b",
+  "text": "#302b20",
+  "water": "#947e70",
+  "parks": "#c2a882",
+  "road_motorway": "#b8956a",
+  "road_primary": "#c4a07a",
+  "road_secondary": "#cead88",
+  "road_tertiary": "#d4b894",
+  "road_residential": "#dcc4a4",
+  "road_default": "#cead88"
+}

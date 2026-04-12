@@ -1,0 +1,20 @@
+{
+  "name": "Positron",
+  "style_url": "https://raw.githubusercontent.com/openmaptiles/positron-gl-style/master/style.json",
+  "style_json_url": "https://raw.githubusercontent.com/openmaptiles/positron-gl-style/master/style.json",
+  "description": "Beautiful minimal light basemap by OpenMapTiles. Soft grey-white background, cool grey water, pale green parks \u2014 clean and elegant for data overlays.",
+  "author": "OpenMapTiles",
+  "source": "https://github.com/openmaptiles/positron-gl-style",
+  "license": "BSD-2-Clause",
+  "openmaptiles": true,
+  "bg": "#f2f3f0",
+  "text": "#757981",
+  "water": "#c2c8ca",
+  "parks": "#e6e9e5",
+  "road_motorway": "#ffffff",
+  "road_primary": "#ffffff",
+  "road_secondary": "#ffffff",
+  "road_tertiary": "#e0e0e0",
+  "road_residential": "#e0e0e0",
+  "road_default": "#e0e0e0"
+}

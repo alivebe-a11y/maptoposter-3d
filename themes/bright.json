@@ -1,0 +1,19 @@
+{
+  "name": "Bright",
+  "style_url": "mapbox://styles/mapbox/bright-v8",
+  "style_json_url": "https://raw.githubusercontent.com/mapbox/mapbox-gl-styles/master/styles/bright-v8.json",
+  "description": "Template for complex custom basemaps. Warm cream background, amber motorways, soft blue water \u2014 a versatile light base for cartographic work.",
+  "author": "Mapbox",
+  "source": "https://github.com/mapbox/mapbox-gl-styles",
+  "license": "BSD-2-Clause",
+  "bg": "#f8f4f0",
+  "text": "#333333",
+  "water": "#a0c8f0",
+  "parks": "#d8e8c8",
+  "road_motorway": "#ffcc88",
+  "road_primary": "#ffeeaa",
+  "road_secondary": "#ffeeaa",
+  "road_tertiary": "#ffeeaa",
+  "road_residential": "#ffffff",
+  "road_default": "#ffffff"
+}
