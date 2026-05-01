@@ -214,11 +214,11 @@ def generate():
                         'count': len(all_new_files), 'themes': themes})
 
 
-@app.route('/api/styles/<theme_name>')
+@app.route('/api/styles/<path:theme_name>')
 def serve_custom_style(theme_name):
     """Serve raw Mapbox GL style JSON for a custom theme dropped into custom_themes/."""
-    # Basic sanitise — only allow alphanumeric + underscores/hyphens
-    if not all(c.isalnum() or c in ('_', '-') for c in theme_name):
+    # Block path traversal; allow alphanumeric plus the characters common in Mapbox style IDs
+    if '..' in theme_name or '/' in theme_name or '\\' in theme_name:
         return jsonify({'error': 'Invalid theme name'}), 400
     style_path = os.path.join(CUSTOM_THEME_DIR, theme_name, 'style.json')
     if not os.path.exists(style_path):
