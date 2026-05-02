@@ -18,6 +18,8 @@ let showContours = false;
 let contourUnit = 'meters';
 let roadWidthMultiplier = 1.0;
 let roadLayerOriginalWidths = {}; // { layerId: original line-width value }
+let showLabels = false; // off by default for clean poster look
+let badgePosition = 'center'; // 'center' (default) or 'bottom'
 
 // ---- Distance ↔ Zoom Conversion ----
 // Formula based on 4096px capture canvas, Mapbox 512px tile size:
@@ -401,10 +403,7 @@ function getThemeStyleUrl(themeName) {
 
 function applyBasemapConfig(map, lp) {
   try { map.setConfigProperty('basemap', 'lightPreset', lp || 'dusk'); } catch (e) {}
-  try { map.setConfigProperty('basemap', 'showPointOfInterestLabels', false); } catch (e) {}
-  try { map.setConfigProperty('basemap', 'showPlaceLabels', false); } catch (e) {}
-  try { map.setConfigProperty('basemap', 'showRoadLabels', false); } catch (e) {}
-  try { map.setConfigProperty('basemap', 'showTransitLabels', false); } catch (e) {}
+  // Labels handled by applyMapLabels (driven by the showLabels toggle)
 }
 
 // ---- Theme Preview Overlay ----
@@ -473,19 +472,40 @@ function apply3dBuildings(map, enabled) {
   if (!map) return;
   // Mapbox Standard v3 config
   try { map.setConfigProperty('basemap', 'show3dObjects', enabled); } catch (e) {}
-  // Custom styles: toggle fill-extrusion layers by visibility
+  // Custom styles: every fill-extrusion layer represents 3D geometry, so toggle them all
   try {
     const style = map.getStyle();
     if (style && style.layers) {
       style.layers.forEach(layer => {
         if (layer.type === 'fill-extrusion') {
-          const id = layer.id.toLowerCase();
-          if (id.includes('building') || id.includes('3d') || id.includes('extrusion')) {
+          try {
             map.setLayoutProperty(layer.id, 'visibility', enabled ? 'visible' : 'none');
-          }
+          } catch (e) {}
         }
       });
     }
+  } catch (e) {}
+}
+
+function applyMapLabels(map, enabled) {
+  if (!map) return;
+  // Mapbox Standard v3 config
+  try { map.setConfigProperty('basemap', 'showPointOfInterestLabels', enabled); } catch (e) {}
+  try { map.setConfigProperty('basemap', 'showPlaceLabels', enabled); } catch (e) {}
+  try { map.setConfigProperty('basemap', 'showRoadLabels', enabled); } catch (e) {}
+  try { map.setConfigProperty('basemap', 'showTransitLabels', enabled); } catch (e) {}
+  // Custom styles: hide every symbol layer that has a text-field (skip our own contour labels)
+  try {
+    const style = map.getStyle();
+    if (!style || !style.layers) return;
+    style.layers.forEach(layer => {
+      if (layer.type !== 'symbol') return;
+      if (CONTOUR_LAYERS.includes(layer.id)) return;
+      if (!layer.layout || layer.layout['text-field'] === undefined) return;
+      try {
+        map.setLayoutProperty(layer.id, 'visibility', enabled ? 'visible' : 'none');
+      } catch (e) {}
+    });
   } catch (e) {}
 }
 
@@ -627,6 +647,7 @@ function applyMapLayers(map) {
   apply3dTerrain(map, show3dTerrain, terrainExaggeration);
   applyContours(map, showContours, contourUnit);
   applyRoadWidth(map, roadWidthMultiplier);
+  applyMapLabels(map, showLabels);
 }
 
 // ---- Init Map Layer Controls ----
@@ -674,9 +695,9 @@ function initMapLayersControls() {
     });
   }
 
-  document.querySelectorAll('.unit-btn').forEach(btn => {
+  document.querySelectorAll('#contourOptions .unit-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      document.querySelectorAll('.unit-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('#contourOptions .unit-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       contourUnit = btn.dataset.unit;
       if (showContours && previewMap && previewMap.isStyleLoaded()) {
@@ -698,6 +719,25 @@ function initMapLayersControls() {
       if (previewMap && previewMap.isStyleLoaded()) applyRoadWidth(previewMap, roadWidthMultiplier);
     });
   }
+
+  // Labels (street names, places, POIs)
+  const togLabels = document.getElementById('toggleLabels');
+  if (togLabels) {
+    togLabels.checked = showLabels;
+    togLabels.addEventListener('change', () => {
+      showLabels = togLabels.checked;
+      if (previewMap && previewMap.isStyleLoaded()) applyMapLabels(previewMap, showLabels);
+    });
+  }
+
+  // Badge position
+  document.querySelectorAll('#badgePositionToggle .unit-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#badgePositionToggle .unit-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      badgePosition = btn.dataset.pos;
+    });
+  });
 }
 
 // ---- Preview Map ----
@@ -843,6 +883,7 @@ function capture3DMap() {
       apply3dBuildings(captureMap, show3dBuildings);
       apply3dTerrain(captureMap, show3dTerrain, terrainExaggeration);
       applyContours(captureMap, showContours, contourUnit);
+      applyMapLabels(captureMap, showLabels);
       // Road width: use preview cache if available, otherwise cache from capture map
       if (roadWidthMultiplier !== 1.0) {
         if (Object.keys(captureRoadCache).length === 0) cacheRoadWidths(captureMap);
@@ -932,6 +973,7 @@ async function generatePosters() {
       themes: selectedThemes,
       stadium: stadiumName,
       badge: badge,
+      badge_position: badgePosition,
       overlay_config: cfg
     };
 

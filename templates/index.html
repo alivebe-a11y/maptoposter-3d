@@ -169,6 +169,14 @@
         </div>
 
         <div class="toggle-row">
+          <span class="toggle-label">Street &amp; Place Labels</span>
+          <label class="toggle-switch">
+            <input type="checkbox" id="toggleLabels" />
+            <span class="toggle-knob"></span>
+          </label>
+        </div>
+
+        <div class="toggle-row">
           <span class="toggle-label">Contours</span>
           <label class="toggle-switch">
             <input type="checkbox" id="toggleContours" />
@@ -228,6 +236,14 @@
             <option value="{{ badge }}">{{ badge }}</option>
             {% endfor %}
           </select>
+        </div>
+
+        <div class="form-row">
+          <label>Badge Position</label>
+          <div class="unit-toggle" id="badgePositionToggle">
+            <button type="button" class="unit-btn active" data-pos="center">Center</button>
+            <button type="button" class="unit-btn" data-pos="bottom">Bottom</button>
+          </div>
         </div>
       </div>
 
